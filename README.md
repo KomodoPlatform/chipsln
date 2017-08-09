@@ -1,4 +1,4 @@
-# c-lightning: A specification compliant Lightning Network implementation in C
+# c-lightning: A specification compliant Lightning Network implementation in C -> ported to work with CHIPS
 
 c-lightning is a [standard compliant](https://github.com/lightningnetwork/lightning-rfc) implementation of the Lightning Network protocol.
 The Lightning Network is a scalability solution for Bitcoin, enabling secure and instant transfer of funds between any two party for any amount. 
