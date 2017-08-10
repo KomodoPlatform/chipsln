@@ -391,16 +391,13 @@ static void process_getblockcount(struct bitcoin_cli *bcli)
 {
 	u32 blockcount;
 	char *p, *end;
-	void (*cb)(struct bitcoind *bitcoind,
-		   u32 blockcount,
-		   void *arg) = bcli->cb;
-
+	void (*cb)(struct bitcoind *bitcoind,u32 blockcount,void *arg) = bcli->cb;
 	p = tal_strndup(bcli, bcli->output, bcli->output_bytes);
 	blockcount = strtol(p, &end, 10);
 	if (end == p || *end != '\n')
 		fatal("%s: gave non-numeric blockcount %s",
 		      bcli_args(bcli), p);
-
+    printf("process blockcount.(%s)\n",p);
 	cb(bcli->bitcoind, blockcount, bcli->cb_arg);
 }
 
