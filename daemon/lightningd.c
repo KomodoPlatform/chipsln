@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 
 	dstate->topology = new_topology(dstate, dstate->base_log);
 	dstate->bitcoind = new_bitcoind(dstate, dstate->base_log);
-	dstate->bitcoind->chainparams = chainparams_for_network("regtest");
+	dstate->bitcoind->chainparams = chainparams_for_network("chips");
 
 	/* Handle options and config; move to .lightningd */
 	register_opts(dstate);
