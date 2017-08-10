@@ -15,7 +15,7 @@ Don't hesitate to reach out to us on IRC at [#lightning-dev @ freenode.net](http
 
 ## Getting Started
 
-c-lightning currently only works on Linux (and possibly Mac OS with some tweaking), and requires a locally running `bitcoind` that is fully caught up with the network you're testing on.
+c-lightning currently only works on Linux (and possibly Mac OS with some tweaking), and requires a locally running `chipsd` that is fully caught up with the network you're testing on.
 
 ### Installation
 
@@ -24,29 +24,20 @@ For the impatient here's the gist of it for Ubuntu and Debian:
 
 ```
 sudo apt-get install -y autoconf git build-essential libtool libprotobuf-c-dev libgmp-dev libsqlite3-dev python python3
-git clone https://github.com/ElementsProject/lightning.git
+git clone https://github.com/jl777/chipsln
 cd lightning
 make
 ```
 
-Or if you like to throw `docker` into the mix:
-
-```
-sudo docker run \
-	-v $HOME/.lightning:/root/.lightning \
-	-v $HOME/.bitcoin:/root/.bitcoin \
-	-p 9735:9735 \
-	/cdecker/lightningd:master
-```
 ### Starting `lightningd`
 
-In order to start `lightningd` you will need to have a local `bitcoind` node running in either testnet or regtest mode:
+In order to start `lightningd` you will need to have a local `chipsd` node running:
 
 ```
-bitcoind -daemon -testnet
+chipsd -daemon
 ```
 
-Once `bitcoind` has synchronized with the testnet/regtest network, you can start `lightningd` with the following command:
+Once `chipsd` has synchronized with the network, you can start `lightningd` with the following command:
 
 ```
 lightningd/lightningd --log-level=debug
@@ -61,10 +52,10 @@ First you need to transfer some funds to `lightningd` so that it can open a chan
 daemon/lightning-cli newaddr 
 
 # Returns a transaction id <txid>
-bitcoin-cli -testnet sendtoaddress <address> <amount>
+chips-cli sendtoaddress <address> <amount>
 
 # Retrieves the raw transaction <rawtx>
-bitcoin-cli -testnet getrawtransaction <txid>
+chips-cli getrawtransaction <txid>
 
 # Notifies `lightningd` that there are now funds available:
 daemon/lightning-cli addfunds <rawtx>

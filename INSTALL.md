@@ -45,7 +45,6 @@ bitcoind
 ./daemon/lightningd
 ./daemon/lightning-cli help
 ```
-**Note**: You may need to include `testnet=1` in `bitcoin.conf`
 
 To Build on Ubuntu 15.10
 ------------------------
