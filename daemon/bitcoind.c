@@ -93,6 +93,7 @@ static char *bcli_args(struct bitcoin_cli *bcli)
 		ret = tal_strcat(bcli, take(ret), " ");
 		ret = tal_strcat(bcli, take(ret), bcli->args[i]);
 	}
+    printf("ARGS.(%s)\n",ret);
 	return ret;
 }
 
@@ -179,7 +180,6 @@ start_bitcoin_cli(struct bitcoind *bitcoind,
 {
 	va_list ap;
 	struct bitcoin_cli *bcli = tal(bitcoind, struct bitcoin_cli);
-    printf("ISSUE.(%s)\n",cmd);
 	bcli->bitcoind = bitcoind;
 	bcli->process = process;
 	bcli->cb = cb;
@@ -407,7 +407,7 @@ void bitcoind_getblockcount_(struct bitcoind *bitcoind,
 					 void *arg),
 			      void *arg)
 {
-	start_bitcoin_cli(bitcoind, NULL, process_getblockcount, true, cb, arg,
+	start_bitcoin_cli(bitcoind, NULL, process_getblockcount, false, cb, arg,
 			  "getblockcount", NULL);
 }
 
