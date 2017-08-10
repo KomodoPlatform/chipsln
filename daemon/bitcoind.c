@@ -48,7 +48,7 @@ static char **gather_args(struct bitcoind *bitcoind,
     {
         int32_t i;
         for (i=0; i<n; i++)
-            printf("%s ",args[i]);
+            printf("(%s).%d ",args[i],i);
         printf(" args.%d\n",(int32_t)n);
     }
 	return args;
