@@ -30,7 +30,7 @@ static char **gather_args(struct bitcoind *bitcoind,
 	size_t n = 0;
 	char **args = tal_arr(ctx, char *, 3);
 
-	//args[n++] = cast_const(char *, bitcoind->chainparams->cli);
+	args[n++] = cast_const(char *, bitcoind->chainparams->cli);
 	args[n++] = cast_const(char *, bitcoind->chainparams->cli_args);
 
 	if (bitcoind->datadir) {
@@ -45,6 +45,12 @@ static char **gather_args(struct bitcoind *bitcoind,
 		n++;
 		tal_resize(&args, n + 1);
 	}
+    {
+        int32_t i;
+        for (i=0; i<n; i++)
+            printf("%s ",args[i]);
+        printf(" args.%d\n",n);
+    }
 	return args;
 }
 
@@ -142,7 +148,7 @@ static void next_bcli(struct bitcoind *bitcoind)
 
 	bcli->pid = pipecmdarr(&bcli->fd, NULL, &bcli->fd, bcli->args);
 	if (bcli->pid < 0)
-		fatal("%s exec failed: %s", bcli->args[0], strerror(errno));
+		fatal("(%s) exec failed: %s", bcli->args[0], strerror(errno));
 
 	bitcoind->req_running = true;
 	conn = io_new_conn(bitcoind, bcli->fd, output_init, bcli);
