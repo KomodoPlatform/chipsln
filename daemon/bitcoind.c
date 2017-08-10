@@ -407,7 +407,7 @@ void bitcoind_getblockcount_(struct bitcoind *bitcoind,
 					 void *arg),
 			      void *arg)
 {
-	start_bitcoin_cli(bitcoind, NULL, process_getblockcount, false, cb, arg,
+	start_bitcoin_cli(bitcoind, NULL, process_getblockcount, true, cb, arg,
 			  "getblockcount", NULL);
 }
 
