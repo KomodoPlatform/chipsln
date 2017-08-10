@@ -30,7 +30,7 @@ static char **gather_args(struct bitcoind *bitcoind,
 	size_t n = 0;
 	char **args = tal_arr(ctx, char *, 3);
 
-	args[n++] = cast_const(char *, bitcoind->chainparams->cli);
+	//args[n++] = cast_const(char *, bitcoind->chainparams->cli);
 	args[n++] = cast_const(char *, bitcoind->chainparams->cli_args);
 
 	if (bitcoind->datadir) {
@@ -93,7 +93,6 @@ static char *bcli_args(struct bitcoin_cli *bcli)
 		ret = tal_strcat(bcli, take(ret), " ");
 		ret = tal_strcat(bcli, take(ret), bcli->args[i]);
 	}
-    printf("ARGS.(%s)\n",ret);
 	return ret;
 }
 
@@ -215,8 +214,7 @@ static void process_estimatefee_6(struct bitcoin_cli *bcli)
 	p = tal_strndup(bcli, bcli->output, bcli->output_bytes);
 	fee = strtod(p, &end);
 	if (end == p || *end != '\n')
-		fatal("%s: gave non-numeric fee %s",
-		      bcli_args(bcli), p);
+		fatal("%s: gave non-numeric fee %s",bcli_args(bcli), p);
 
 	if (fee < 0) {
 		log_unusual(bcli->bitcoind->log,
