@@ -31,7 +31,8 @@ static char **gather_args(struct bitcoind *bitcoind,
 	char **args = tal_arr(ctx, char *, 3);
 
 	args[n++] = cast_const(char *, bitcoind->chainparams->cli);
-	args[n++] = cast_const(char *, bitcoind->chainparams->cli_args);
+    if ( bitcoind->chainparams->cli_args != 0 && bitcoind->chainparams->cli_args[0] != 0 )
+        args[n++] = cast_const(char *, bitcoind->chainparams->cli_args);
 
 	if (bitcoind->datadir) {
 		args[n++] = tal_fmt(args, "-datadir=%s", bitcoind->datadir);
