@@ -41,6 +41,7 @@ static struct lightningd_state *lightningd_state(void)
 	list_head_init(&dstate->pay_commands);
 	dstate->portnum = 0;
     dstate->testnet = false;//true;
+    printf("dstate->testnet.%d\n",dstate->testnet);
 	timers_init(&dstate->timers, time_mono());
 	list_head_init(&dstate->wallet);
 	list_head_init(&dstate->addresses);

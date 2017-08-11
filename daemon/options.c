@@ -253,10 +253,8 @@ static void config_register_opts(struct lightningd_state *dstate)
 
 static void dev_register_opts(struct lightningd_state *dstate)
 {
-	opt_register_noarg("--dev-no-routefail", opt_set_bool,
-			   &dstate->dev_never_routefail, opt_hidden);
-	opt_register_noarg("--dev-no-broadcast", opt_set_bool,
-			   &dstate->topology->dev_no_broadcast, opt_hidden);
+	opt_register_noarg("--dev-no-routefail", opt_set_bool,&dstate->dev_never_routefail, opt_hidden);
+	opt_register_noarg("--dev-no-broadcast", opt_set_bool,&dstate->topology->dev_no_broadcast, opt_hidden);
 }
 
 static const struct config testnet_config = {
@@ -417,8 +415,7 @@ static void setup_default_config(struct lightningd_state *dstate)
 {
 	if (dstate->testnet)
 		dstate->config = testnet_config;
-	else
-		dstate->config = mainnet_config;
+	else dstate->config = mainnet_config;
 }
 
 
