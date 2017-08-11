@@ -397,9 +397,7 @@ static void check_config(struct lightningd_state *dstate)
 		      dstate->config.commitment_fee_max_percent);
 
 	if (dstate->config.forever_confirms < 100 && !dstate->testnet)
-		log_unusual(dstate->base_log,
-			    "Warning: forever-confirms of %u is less than 100!",
-			    dstate->config.forever_confirms);
+		log_unusual(dstate->base_log,"Warning: forever-confirms of %u is less than 100!",dstate->config.forever_confirms);
 
 	if (dstate->config.anchor_confirms == 0)
 		fatal("anchor-confirms must be greater than zero");

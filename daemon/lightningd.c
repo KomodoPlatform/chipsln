@@ -40,7 +40,7 @@ static struct lightningd_state *lightningd_state(void)
 	list_head_init(&dstate->peers);
 	list_head_init(&dstate->pay_commands);
 	dstate->portnum = 0;
-	dstate->testnet = true;
+    dstate->testnet = false;//true;
 	timers_init(&dstate->timers, time_mono());
 	list_head_init(&dstate->wallet);
 	list_head_init(&dstate->addresses);
