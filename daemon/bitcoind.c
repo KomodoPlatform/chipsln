@@ -224,6 +224,7 @@ static void process_estimatefee_6(struct bitcoin_cli *bcli)
 		fatal("%s: gave non-numeric fee %s",bcli_args(bcli), p);
 
 	if (fee < 0) {
+        printf("estimatefee.(%s)\n",p);
 		log_unusual(bcli->bitcoind->log,
 			    "Unable to estimate fee");
 		fee_rate = 0;
