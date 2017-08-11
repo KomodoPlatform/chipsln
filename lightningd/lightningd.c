@@ -120,7 +120,7 @@ static struct lightningd *new_lightningd(const tal_t *ctx)
 	list_head_init(&ld->dstate.peers);
 	list_head_init(&ld->dstate.pay_commands);
 	ld->dstate.portnum = DEFAULT_PORT;
-	ld->dstate.testnet = true;
+    ld->dstate.testnet = false;//true;
 	timers_init(&ld->dstate.timers, time_mono());
 	list_head_init(&ld->dstate.wallet);
 	list_head_init(&ld->dstate.addresses);
