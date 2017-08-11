@@ -157,8 +157,7 @@ static void test_daemons(const struct lightningd *ld)
 		int outfd;
 		const char *dpath = path_join(ctx, ld->daemon_dir, daemons[i]);
 		const char *verstring;
-		pid_t pid = pipecmd(&outfd, NULL, &outfd,
-				    dpath, "--version", NULL);
+		pid_t pid = pipecmd(&outfd, NULL, &outfd,dpath, "--version", NULL);
 
 		log_debug(ld->dstate.base_log, "testing %s", dpath);
 		if (pid == -1)
@@ -166,9 +165,8 @@ static void test_daemons(const struct lightningd *ld)
 		verstring = grab_fd(ctx, outfd);
 		if (!verstring)
 			err(1, "Could not get output from %s", dpath);
-		if (!strstarts(verstring, version())
-		    || verstring[strlen(version())] != '\n')
-			errx(1, "%s: bad version '%s'", daemons[i], verstring);
+		if (!strstarts(verstring, version()) || verstring[strlen(version())] != '\n')
+			errx(1, "(%s): bad version (%s)", daemons[i], verstring);
 	}
 	tal_free(ctx);
 }

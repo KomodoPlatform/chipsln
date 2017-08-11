@@ -451,7 +451,6 @@ struct bitcoind *new_bitcoind(const tal_t *ctx, struct log *log)
 
 	/* Use testnet by default, change later if we want another network */
 	bitcoind->chainparams = chainparams_for_network("chips");
-    printf("newbitcoin testnet.%d\n",bitcoind->chainparams->testnet);
 	bitcoind->datadir = NULL;
 	bitcoind->log = log;
 	bitcoind->req_running = false;
