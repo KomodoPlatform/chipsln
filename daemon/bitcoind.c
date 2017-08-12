@@ -226,13 +226,14 @@ static void process_estimatefee_6(struct bitcoin_cli *bcli)
 
 	if (fee < 0) {
         fee = 0.00010000;
-        printf("estimatefee.(%s) -> default to %.8f\n",p,fee);
-		log_unusual(bcli->bitcoind->log,"Unable to estimate fee, default to 0.00020000");
+        //printf("estimatefee.(%s) -> default to %.8f\n",p,fee);
+		//log_unusual(bcli->bitcoind->log,"Unable to estimate fee, default to 0.00020000");
 	}
     else
     {
-        // Since we used 6 as an estimate, double it.
         fee *= 2;
+        printf("estimatefee.(%s) ->  %.8f\n",p,fee);
+        // Since we used 6 as an estimate, double it.
     }
     fee_rate = fee * 100000000;
 
