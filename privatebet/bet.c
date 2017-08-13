@@ -51,7 +51,7 @@ void randombytes_buf(void * const buf, const size_t size)
 
 int main(int argc,const char *argv[])
 {
-    char *retstr,connectaddr[128],bindaddr[128],*modestr,*hostip="127.0.0.1",*retstr; cJSON *argjson,*reqjson,*deckjson; bits256 pubkeys[64],privkeys[64]; uint32_t i,n,range,numplayers; int32_t testmode=0,pubsock=-1,subsock=-1,pullsock=-1,pushsock=-1; long fsize; uint16_t tmp,rpcport=7797,port = 7797+1;
+    char connectaddr[128],bindaddr[128],*modestr,*hostip="127.0.0.1",*retstr; cJSON *argjson,*reqjson,*deckjson; bits256 pubkeys[64],privkeys[64]; uint32_t i,n,range,numplayers; int32_t testmode=0,pubsock=-1,subsock=-1,pullsock=-1,pushsock=-1; long fsize; uint16_t tmp,rpcport=7797,port = 7797+1;
     libgfshare_init();
     OS_init();
     portable_mutex_init(&LP_peermutex);
