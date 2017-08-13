@@ -93,49 +93,6 @@ bits256 *BET_process_packet(bits256 *cardpubs,bits256 *deckidp,bits256 senderpub
     return(-1);*/
 }
 
-void BET_roundstart(int32_t pubsock,cJSON *deckjson,int32_t numcards,bits256 *privkeys,bits256 *playerpubs,int32_t numplayers,bits256 privkey0)
-{
-    static uint8_t *decoded; static int32_t decodedlen;
-    int32_t i,n,len=0,slen,size=0; bits256 deckid; uint8_t *sendbuf=0; cJSON *array; char *deckjsonstr,*msg; cJSON *sendjson;
-    deckid = jbits256(deckjson,"deckid");
-    if ( (array= jarray(&n,deckjson,"ciphers")) != 0 && n == numplayers )
-    {
-        sendjson = jduplicate(deckjson);
-        jdelete(sendjson,"ciphers");
-        jdelete(sendjson,"result");
-        deckjsonstr = jprint(sendjson,1);
-        //printf("deckjsonstr.(%s)\n",deckjsonstr);
-        slen = (int32_t)strlen(deckjsonstr);
-        for (i=0; i<numplayers; i++)
-        {
-            fprintf(stderr,"%d ",i);
-            msg = jstri(array,i);
-            if ( sendbuf == 0 )
-            {
-                len = (int32_t)strlen(msg) >> 1;
-                size = slen + 1 + sizeof(playerpubs[i]) + len;
-                sendbuf = malloc(size);
-                memcpy(sendbuf,deckjsonstr,slen+1);
-            }
-            else if ( (strlen(msg) >> 1) != len )
-            {
-                printf("[%d of %d] unexpected mismatched len.%d vs %d\n",i,numplayers,(int32_t)strlen(msg),len);
-                continue;
-            }
-            memcpy(&sendbuf[slen+1],playerpubs[i].bytes,sizeof(playerpubs[i]));
-            decode_hex(&sendbuf[slen+1+sizeof(playerpubs[i])],len,msg);
-            if ( decodedlen < size )
-            {
-                decoded = realloc(decoded,size);
-                decodedlen = size;
-                printf("alloc decoded[%d]\n",size);
-            }
-            BET_broadcast(pubsock,decoded,decodedlen,privkeys,playerpubs,numplayers,numcards,sendbuf,size,deckid);
-        }
-        free(deckjsonstr);
-    }
-}
-
 void BET_clientloop(void *_ptr)
 {
     int32_t nonz,recvlen; void *ptr; cJSON *msgjson; struct privatebet_vars *VARS; struct privatebet_info *bet = _ptr;
