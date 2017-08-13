@@ -25,14 +25,17 @@ int32_t LP_canbind,IAMLP;
 struct LP_peerinfo  *LP_peerinfos,*LP_mypeer;
 bits256 Mypubkey,Myprivkey;
 
+#include "../../SuperNET/iguana/exchanges/LP_network.c"
+#include "../../SuperNET/iguana/exchanges/LP_secp.c"
+#include "../../SuperNET/iguana/exchanges/LP_bitcoin.c"
+
+
 #include "gfshare.c"
 #include "cards777.c"
 #include "commands.c"
 #include "gameloop.c"
 #include "network.c"
 #include "states.c"
-
-int cli_main(char *buffer,int32_t maxsize,int argc, char *argv[]);
 
 // original shuffle with player 2 encrypting to destplayer
 // autodisconnect
