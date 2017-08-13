@@ -13,31 +13,6 @@
  *                                                                            *
  ******************************************************************************/
 
-/*
-{ "command" : "getnodes", "description" : "Retrieve all nodes in our local network view" },
-{ "command" : "getroute", "description" : "Return route to {id} for {msatoshi}, using {riskfactor}" },
-{ "command" : "getchannels", "description" : "List all known channels." },
-{ "command" : "sendpay", "description" : "Send along {route} in return for preimage of {rhash}" },
-{ "command" : "connect", "description" : "Connect to a {host} at {port} expecting node {id}" },
-{ "command" : "getpeers", "description" : "List the current peers, if {level} is set, include {log}s" },
-{ "command" : "fundchannel", "description" : "Fund channel with {id} using {satoshi} satoshis" },
-{ "command" : "close", "description" : "Close the channel with peer {id}" },
-{ "command" : "dev-blockheight", "description" : "Find out what block height we have" },
-{ "command" : "invoice", "description" : "Create invoice for {msatoshi} with {label} (with a set {r}, otherwise generate one)" },
-{ "command" : "listinvoice", "description" : "Show invoice {label} (or all, if no {label}))" },
-{ "command" : "delinvoice", "description" : "Delete unpaid invoice {label}))" },
-{ "command" : "waitanyinvoice", "description" : "Wait for the next invoice to be paid, after {label} (if supplied)))" },
-{ "command" : "waitinvoice", "description" : "Wait for an incoming payment matching the invoice with {label}" },
-{ "command" : "help", "description" : "describe commands" },
-{ "command" : "stop", "description" : "Shutdown the lightningd process" },
-{ "command" : "getlog", "description" : "Get logs, with optional level: [io|debug|info|unusual]" },
-{ "command" : "dev-rhash", "description" : "SHA256 of {secret}" },
-{ "command" : "getinfo", "description" : "Get general information about this node" },
-{ "command" : "withdraw", "description" : "Send {satoshi} to the {destination} address via Bitcoin transaction" },
-{ "command" : "newaddr", "description" : "Get a new address to fund a channel" },
-{ "command" : "addfunds", "description" : "Add funds for lightningd to spend to create channels, using {tx}" } ]
-*/
-
 char *chipsln_command(void *ctx,cJSON *argjson,char *remoteaddr,uint16_t port)
 {
     int32_t n,numargs,maxsize = 1000000; char *args[16],*cmdstr,*buffer = malloc(maxsize);
@@ -55,10 +30,9 @@ char *chipsln_command(void *ctx,cJSON *argjson,char *remoteaddr,uint16_t port)
     return(buffer);
 }
 
-cJSON *chipsln_noargs(char *method)
+cJSON *chipsln_issue(char *buf)
 {
-    char *retstr,buf[1024]; cJSON *retjson,*argjson;
-    sprintf(buf,"{\"method\":\"%s\"}",method);
+    char *retstr; cJSON *retjson,*argjson;
     argjson = cJSON_Parse(buf);
     if ( (retstr= chipsln_command(0,argjson,"127.0.0.1",0)) != 0 )
     {
@@ -69,8 +43,86 @@ cJSON *chipsln_noargs(char *method)
     return(retjson);
 }
 
+cJSON *chipsln_noargs(char *method)
+{
+    char buf[1024];
+    sprintf(buf,"{\"method\":\"%s\"}",method);
+    return(chipsln_issue(buf));
+}
+
+cJSON *chipsln_strarg(char *method,char *str)
+{
+    char buf[4096];
+    sprintf(buf,"{\"method\":\"%s\",\"params\":[\"%s\"]}",method,str);
+    return(chipsln_issue(buf));
+}
+
+cJSON *chipsln_strnum(char *method,char *str,uint64_t num)
+{
+    char buf[4096];
+    sprintf(buf,"{\"method\":\"%s\",\"params\":[\"%s\", %llu]}",method,str,(long long)num);
+    return(chipsln_issue(buf));
+}
+
+cJSON *chipsln_numstr(char *method,char *str,uint64_t num)
+{
+    char buf[4096];
+    sprintf(buf,"{\"method\":\"%s\",\"params\":[%llu, \"%s\"]}",method,(long long)num,str);
+    return(chipsln_issue(buf));
+}
+
 cJSON *chipsln_getinfo() { return(chipsln_noargs("getinfo")); }
 cJSON *chipsln_help() { return(chipsln_noargs("help")); }
+cJSON *chipsln_stop() { return(chipsln_noargs("stop")); }
+cJSON *chipsln_newaddr() { return(chipsln_noargs("newaddr")); }
+cJSON *chipsln_getnodes() { return(chipsln_noargs("getnodes")); }
+cJSON *chipsln_getpeers() { return(chipsln_noargs("getpeers")); }
+cJSON *chipsln_getchannels() { return(chipsln_noargs("getchannels")); }
+cJSON *chipsln_dev-blockheight() { return(chipsln_noargs("dev-blockheight")); }
+
+cJSON *chipsln_listinvoice(char *label) { return(chipsln_strarg("listinvoice",label)); }
+cJSON *chipsln_delinvoice(char *label) { return(chipsln_strarg("delinvoice",label)); }
+cJSON *chipsln_waitanyinvoice(char *label) { return(chipsln_strarg("waitanyinvoice",label)); }
+cJSON *chipsln_waitinvoice(char *label) { return(chipsln_strarg("waitinvoice",label)); }
+
+cJSON *chipsln_getlog(char *level) { return(chipsln_strarg("getlog",level)); }
+cJSON *chipsln_close(char *idstr) { return(chipsln_strarg("close",idstr)); }
+cJSON *chipsln_dev-rhash(char *secret) { return(chipsln_strarg("dev-rhash",secret)); }
+cJSON *chipsln_addfunds(char *rawtx) { return(chipsln_strarg("addfunds",rawtx)); }
+
+cJSON *chipsln_getroute(char *idstr,uint64_t msatoshi)
+{
+    return(chipsln_strnum("getroute",idstr,msatoshi));
+}
+
+cJSON *chipsln_fundchannel(char *idstr,uint64_t satoshi)
+{
+    return(chipsln_strnum("fundchannel",idstr,satoshi));
+}
+
+cJSON *chipsln_invoice(uint64_t msatoshi,char *label)
+{
+    return(chipsln_numstr("invoice",msatoshi,label));
+}
+
+cJSON *chipsln_withdraw(uint64_t satoshi,char *address)
+{
+    return(chipsln_numstr("withdraw",satoshi,address));
+}
+
+cJSON *chipsln_connect(char *ipaddr,uint16_t port,char *destid)
+{
+    char buf[4096];
+    sprintf(buf,"{\"method\":\"connect\",\"params\":[\"%s\", %u, \"%s\"]}",ipaddr,port,destid);
+    return(chipsln_issue(buf));
+}
+
+cJSON *chipsln_sendpay(cJSON *routejson,bits256 rhash)
+{
+    char buf[16384];
+    sprintf(buf,"{\"method\":\"sendpay\",\"params\":[%s, \"%s\"]}",jprint(routejson,0),bits256_str(str,rhash));
+    return(chipsln_issue(buf));
+}
 
 char *privatebet_command(void *ctx,cJSON *argjson,char *remoteaddr,uint16_t port)
 {

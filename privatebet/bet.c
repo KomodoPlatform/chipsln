@@ -15,7 +15,7 @@
 
 
 #include "bet.h"
-
+char *LN_idstr;
 int32_t Gamestart,Gamestarted,Lastturni,Maxrounds = 3,Maxplayers = 2;
 uint8_t BET_logs[256],BET_exps[510];
 bits256 *Debug_privkeys;
@@ -51,7 +51,7 @@ void randombytes_buf(void * const buf, const size_t size)
 
 int main(int argc,const char *argv[])
 {
-    char connectaddr[128],bindaddr[128],*modestr,*hostip="127.0.0.1",*retstr; cJSON *argjson,*reqjson,*deckjson; bits256 pubkeys[64],privkeys[64]; uint32_t i,n,range,numplayers; int32_t testmode=0,pubsock=-1,subsock=-1,pullsock=-1,pushsock=-1; long fsize; uint16_t tmp,rpcport=7797,port = 7797+1;
+    char connectaddr[128],bindaddr[128],*modestr,*hostip="127.0.0.1",*retstr; cJSON *infojson,*argjson,*reqjson,*deckjson; bits256 pubkeys[64],privkeys[64]; uint32_t i,n,range,numplayers; int32_t testmode=0,pubsock=-1,subsock=-1,pullsock=-1,pushsock=-1; long fsize; uint16_t tmp,rpcport=7797,port = 7797+1;
     libgfshare_init();
     OS_init();
     portable_mutex_init(&LP_peermutex);
@@ -60,8 +60,14 @@ int main(int argc,const char *argv[])
     portable_mutex_init(&LP_psockmutex);
     portable_mutex_init(&LP_messagemutex);
     portable_mutex_init(&BET_shardmutex);
-    printf("getinfo.(%s)\n",jprint(chipsln_getinfo(),1));
+    if ( (infojson= chipsln_getinfo()) != 0 )
+    {
+        if ( (LN_idstr= clonestr(jstr(infojson,"id"))) == 0 || strlen(LN_idstr) != 66 )
+            printf("need 33 byte secp pubkey\n"), exit(-1);
+        printf("getinfo.(%s)\n",jprint(infojson,1));
+    } else printf("need to have CHIPS and lightning running\n"), exit(-1);
     printf("help.(%s)\n",jprint(chipsln_help(),1));
+    printf("LN_idstr.(%s)\n",LN_idstr);
     if ( argc > 1 )
     {
         if ( (argjson= cJSON_Parse(argv[1])) != 0 )
