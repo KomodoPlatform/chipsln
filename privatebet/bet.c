@@ -51,7 +51,7 @@ void randombytes_buf(void * const buf, const size_t size)
 
 int main(int argc,const char *argv[])
 {
-    char connectaddr[128],bindaddr[128],*modestr,*hostip="127.0.0.1",*retstr; cJSON *argjson,*reqjson,*deckjson; bits256 pubkeys[64],privkeys[64]; uint32_t i,n,range,numplayers; int32_t testmode=0,pubsock=-1,subsock=-1,pullsock=-1,pushsock=-1; long fsize; uint16_t tmp,rpcport=7797,port = 7797+1;
+    char *buffer,*args[16],connectaddr[128],bindaddr[128],*modestr,*hostip="127.0.0.1",*retstr; cJSON *argjson,*reqjson,*deckjson; bits256 pubkeys[64],privkeys[64]; uint32_t i,n,range,numplayers; int32_t numargs,maxsize=1000000,testmode=0,pubsock=-1,subsock=-1,pullsock=-1,pushsock=-1; long fsize; uint16_t tmp,rpcport=7797,port = 7797+1;
     libgfshare_init();
     OS_init();
     portable_mutex_init(&LP_peermutex);
@@ -60,6 +60,13 @@ int main(int argc,const char *argv[])
     portable_mutex_init(&LP_psockmutex);
     portable_mutex_init(&LP_messagemutex);
     portable_mutex_init(&BET_shardmutex);
+    buffer = malloc(maxsize);
+    numargs = 0;
+    args[numargs++] = "cli_main";
+    args[numargs++] = "getinfo";
+    args[numargs] = 0;
+    if ( cli_main(buffer,maxsize,args,numargs) == 0 )
+        printf("cli_main.(%s)\n",buffer);
     if ( argc > 1 )
     {
         if ( (argjson= cJSON_Parse(argv[1])) != 0 )
