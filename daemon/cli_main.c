@@ -107,7 +107,7 @@ int cli_main(char *buffer,int32_t maxsize,int argc, char *argv[],char *cmd)
 	if (!write_all(fd, cmd, strlen(cmd)))
 		err(ERROR_TALKING_TO_LIGHTNINGD, "Writing command");
 
-	resp = tal_arr(cmd, char, 100);
+	resp = tal_arr(cmd, char, 4096);
 	off = 0;
 	num_opens = num_closes = 0;
 	while ((i = read(fd, resp + off, tal_count(resp) - 1 - off)) > 0) {

@@ -46,28 +46,28 @@ cJSON *chipsln_issue(char *buf)
 cJSON *chipsln_noargs(char *method)
 {
     char buf[1024];
-    sprintf(buf,"{\"method\":\"%s\"}",method);
+    sprintf(buf,"{ \"method\":\"%s\", \"id\":\"chipsln-%d\", \"params\":[] }",method,getpid());
     return(chipsln_issue(buf));
 }
 
 cJSON *chipsln_strarg(char *method,char *str)
 {
     char buf[4096];
-    sprintf(buf,"{\"method\":\"%s\",\"params\":[\"%s\"]}",method,str);
+    sprintf(buf,"{ \"method\":\"%s\", \"id\":\"chipsln-%d\", \"params\":[\"%s\"] }",method,getpid(),str);
     return(chipsln_issue(buf));
 }
 
 cJSON *chipsln_strnum(char *method,char *str,uint64_t num)
 {
     char buf[4096];
-    sprintf(buf,"{\"method\":\"%s\",\"params\":[\"%s\", %llu]}",method,str,(long long)num);
+    sprintf(buf,"{ \"method\":\"%s\", \"id\":\"chipsln-%d\", \"params\":[\"%s\", %llu] }",method,getpid(),str,(long long)num);
     return(chipsln_issue(buf));
 }
 
 cJSON *chipsln_numstr(char *method,uint64_t num,char *str)
 {
     char buf[4096];
-    sprintf(buf,"{\"method\":\"%s\",\"params\":[%llu, \"%s\"]}",method,(long long)num,str);
+    sprintf(buf,"{ \"method\":\"%s\", \"id\":\"chipsln-%d\", \"params\":[%llu, \"%s\"] }",method,getpid(),(long long)num,str);
     return(chipsln_issue(buf));
 }
 
@@ -108,22 +108,21 @@ cJSON *chipsln_withdraw(uint64_t satoshi,char *address)
 cJSON *chipsln_getroute(char *idstr,uint64_t msatoshi)
 {
     char buf[4096];
-    sprintf(buf,"{\"method\":\"getroute\",\"params\":[\"%s\", %llu, 1]}",idstr,(long long)msatoshi);
+    sprintf(buf,"{ \"method\":\"getroute\", \"id\":\"chipsln-%d\", \"params\":[\"%s\", %llu, 1] }",getpid(),idstr,(long long)msatoshi);
     return(chipsln_issue(buf));
-    return(chipsln_strnum("getroute",idstr,msatoshi));
 }
 
 cJSON *chipsln_connect(char *ipaddr,uint16_t port,char *destid)
 {
     char buf[4096];
-    sprintf(buf,"{\"method\":\"connect\",\"params\":[\"host\":\"%s\", \"port\":%u, \"id\":\"%s\"]}",ipaddr,port,destid);
+    sprintf(buf,"{ \"method\":\"connect\", \"id\":\"chipsln-%d\", \"params\":[\"host\":\"%s\", \"port\":%u, \"id\":\"%s\"] }",getpid(),ipaddr,port,destid);
     return(chipsln_issue(buf));
 }
 
 cJSON *chipsln_sendpay(cJSON *routejson,bits256 rhash)
 {
     char buf[16384],str[65];
-    sprintf(buf,"{\"method\":\"sendpay\",\"params\":[%s, \"%s\"]}",jprint(routejson,0),bits256_str(str,rhash));
+    sprintf(buf,"{ \"method\":\"sendpay\", \"id\":\"chipsln-%d\", \"params\":[%s, \"%s\"] }",getpid(),jprint(routejson,0),bits256_str(str,rhash));
     return(chipsln_issue(buf));
 }
 
