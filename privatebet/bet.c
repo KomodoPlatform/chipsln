@@ -60,8 +60,7 @@ int main(int argc,const char *argv[])
     portable_mutex_init(&LP_psockmutex);
     portable_mutex_init(&LP_messagemutex);
     portable_mutex_init(&BET_shardmutex);
-    retstr = chipsln_command(0,cJSON_Parse("{\"agent\":\"chipsln\",\"method\":\"getinfo\"}"),"127.0.0.1",0);
-    printf("chipsln.(%s)\n",retstr);
+    printf("getinfo.(%s)\n",jprint(chips_getinfo(),1));
     if ( argc > 1 )
     {
         if ( (argjson= cJSON_Parse(argv[1])) != 0 )

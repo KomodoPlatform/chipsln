@@ -13,6 +13,31 @@
  *                                                                            *
  ******************************************************************************/
 
+/*
+{ "command" : "getnodes", "description" : "Retrieve all nodes in our local network view" },
+{ "command" : "getroute", "description" : "Return route to {id} for {msatoshi}, using {riskfactor}" },
+{ "command" : "getchannels", "description" : "List all known channels." },
+{ "command" : "sendpay", "description" : "Send along {route} in return for preimage of {rhash}" },
+{ "command" : "connect", "description" : "Connect to a {host} at {port} expecting node {id}" },
+{ "command" : "getpeers", "description" : "List the current peers, if {level} is set, include {log}s" },
+{ "command" : "fundchannel", "description" : "Fund channel with {id} using {satoshi} satoshis" },
+{ "command" : "close", "description" : "Close the channel with peer {id}" },
+{ "command" : "dev-blockheight", "description" : "Find out what block height we have" },
+{ "command" : "invoice", "description" : "Create invoice for {msatoshi} with {label} (with a set {r}, otherwise generate one)" },
+{ "command" : "listinvoice", "description" : "Show invoice {label} (or all, if no {label}))" },
+{ "command" : "delinvoice", "description" : "Delete unpaid invoice {label}))" },
+{ "command" : "waitanyinvoice", "description" : "Wait for the next invoice to be paid, after {label} (if supplied)))" },
+{ "command" : "waitinvoice", "description" : "Wait for an incoming payment matching the invoice with {label}" },
+{ "command" : "help", "description" : "describe commands" },
+{ "command" : "stop", "description" : "Shutdown the lightningd process" },
+{ "command" : "getlog", "description" : "Get logs, with optional level: [io|debug|info|unusual]" },
+{ "command" : "dev-rhash", "description" : "SHA256 of {secret}" },
+{ "command" : "getinfo", "description" : "Get general information about this node" },
+{ "command" : "withdraw", "description" : "Send {satoshi} to the {destination} address via Bitcoin transaction" },
+{ "command" : "newaddr", "description" : "Get a new address to fund a channel" },
+{ "command" : "addfunds", "description" : "Add funds for lightningd to spend to create channels, using {tx}" } ]
+*/
+
 char *chipsln_command(void *ctx,cJSON *argjson,char *remoteaddr,uint16_t port)
 {
     int32_t n,numargs,maxsize = 1000000; char *args[16],*cmdstr,*buffer = malloc(maxsize);
@@ -28,6 +53,18 @@ char *chipsln_command(void *ctx,cJSON *argjson,char *remoteaddr,uint16_t port)
         buffer[n-1] = 0;
     buffer = realloc(buffer,n+1);
     return(buffer);
+}
+
+cJSON *chips_getinfo()
+{
+    char *retstr; cJSON *argjson = cJSON_Parse("{\"method\":\"getinfo\"}");
+    if ( (retstr= chipsln_command(0,argjson,"127.0.0.1",0)) != 0 )
+    {
+        retjson = cJSON_Parse(retstr);
+        free(retstr);
+    }
+    free_json(argjson);
+    return(retjson);
 }
 
 char *privatebet_command(void *ctx,cJSON *argjson,char *remoteaddr,uint16_t port)
