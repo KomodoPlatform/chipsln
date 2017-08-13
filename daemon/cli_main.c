@@ -52,7 +52,7 @@ int cli_main(char *buffer,int32_t maxsize,int argc, char *argv[],char *cmd)
 {
 	int fd, i, off;
 	const char *method;
-	char *cmd, *resp, *idstr, *rpc_filename;
+	char *resp, *idstr, *rpc_filename;
 	char *result_end;
 	struct sockaddr_un addr;
 	jsmntok_t *toks;
