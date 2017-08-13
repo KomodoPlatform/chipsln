@@ -116,7 +116,7 @@ cJSON *chipsln_getroute(char *idstr,uint64_t msatoshi)
 cJSON *chipsln_connect(char *ipaddr,uint16_t port,char *destid)
 {
     char buf[4096];
-    sprintf(buf,"{\"method\":\"connect\",\"params\":[\"%s\", %u, \"%s\"]}",ipaddr,port,destid);
+    sprintf(buf,"{\"method\":\"connect\",\"params\":[\"host\":\"%s\", \"port\":%u, \"id\":\"%s\"]}",ipaddr,port,destid);
     return(chipsln_issue(buf));
 }
 
