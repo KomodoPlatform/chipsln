@@ -28,9 +28,9 @@ char *chipsln_command(void *ctx,cJSON *argjson,char *remoteaddr,uint16_t port)
             args[numargs++] = jprint(item,0);
         }
     }
-    for (i=0; i<numargs; i++)
-        printf("(%s) ",args[i]);
-    printf(" <- %s\n",jprint(argjson,0));
+    //for (i=0; i<numargs; i++)
+    //    printf("(%s) ",args[i]);
+    //printf(" <- %s\n",jprint(argjson,0));
     cli_main(buffer,maxsize,numargs,args,0);
     if ( numargs > 2 )
     {
@@ -49,7 +49,7 @@ cJSON *chipsln_issue(char *buf)
 {
     char *retstr; cJSON *retjson,*argjson;
     argjson = cJSON_Parse(buf);
-    printf("parse.(%s) <- %s\n",jprint(argjson,0),buf);
+    //printf("parse.(%s) <- %s\n",jprint(argjson,0),buf);
     if ( (retstr= chipsln_command(0,argjson,"127.0.0.1",0)) != 0 )
     {
         retjson = cJSON_Parse(retstr);
