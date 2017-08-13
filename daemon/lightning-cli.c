@@ -175,9 +175,10 @@ int cli_main(char *buffer,int32_t maxsize,int argc, char *argv[])
 		     json_tok_len(id), json_tok_contents(resp, id));
 
 	if (!error || json_tok_is_null(resp, error)) {
-		printf("%.*s\n",
-		       json_tok_len(result),
-		       json_tok_contents(resp, result));
+        if ( strlen(json_tok_contents(resp, result)) < maxsize )
+            sprintf(buffer,"%.*s\n",json_tok_len(result), json_tok_contents(resp, result));
+        else strcpy(buffer,"{\"error\":\"return too big\"}");
+		//printf("%.*s\n",json_tok_len(result),json_tok_contents(resp, result));
 		tal_free(ctx);
 		return 0;
 	}
@@ -193,7 +194,7 @@ int main(int argc, char *argv[])
     int32_t retval = -1,maxsize = 1000000; char *buffer = malloc(maxsize);
     if ( buffer != 0 )
     {
-        if ( cli_main(buffer,maxsize,argc,argv) > 0 )
+        if ( cli_main(buffer,maxsize,argc,argv) == 0 )
         {
             printf("%s\n",buffer);
             retval = 1;
