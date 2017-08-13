@@ -57,7 +57,7 @@ char *chipsln_command(void *ctx,cJSON *argjson,char *remoteaddr,uint16_t port)
 
 cJSON *chips_getinfo()
 {
-    char *retstr; cJSON *argjson = cJSON_Parse("{\"method\":\"getinfo\"}");
+    char *retstr; cJSON *retjson,*argjson = cJSON_Parse("{\"method\":\"getinfo\"}");
     if ( (retstr= chipsln_command(0,argjson,"127.0.0.1",0)) != 0 )
     {
         retjson = cJSON_Parse(retstr);
