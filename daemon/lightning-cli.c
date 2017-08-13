@@ -19,6 +19,7 @@
 #define ERROR_FROM_LIGHTNINGD 1
 #define ERROR_TALKING_TO_LIGHTNINGD 2
 #define ERROR_USAGE 3
+int cli_main(char *buffer,int32_t maxsize,int argc, char *argv[]);
 
 /* Tal wrappers for opt. */
 static void *opt_allocfn(size_t size)
