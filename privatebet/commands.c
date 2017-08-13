@@ -90,11 +90,6 @@ cJSON *chipsln_close(char *idstr) { return(chipsln_strarg("close",idstr)); }
 cJSON *chipsln_devrhash(char *secret) { return(chipsln_strarg("dev-rhash",secret)); }
 cJSON *chipsln_addfunds(char *rawtx) { return(chipsln_strarg("addfunds",rawtx)); }
 
-cJSON *chipsln_getroute(char *idstr,uint64_t msatoshi)
-{
-    return(chipsln_strnum("getroute",idstr,msatoshi));
-}
-
 cJSON *chipsln_fundchannel(char *idstr,uint64_t satoshi)
 {
     return(chipsln_strnum("fundchannel",idstr,satoshi));
@@ -108,6 +103,14 @@ cJSON *chipsln_invoice(uint64_t msatoshi,char *label)
 cJSON *chipsln_withdraw(uint64_t satoshi,char *address)
 {
     return(chipsln_numstr("withdraw",satoshi,address));
+}
+
+cJSON *chipsln_getroute(char *idstr,uint64_t msatoshi)
+{
+    char buf[4096];
+    sprintf(buf,"{\"method\":\"getroute\",\"params\":[\"%s\", %llu, 1]}",idstr,(long long)msatoshi);
+    return(chipsln_issue(buf));
+    return(chipsln_strnum("getroute",idstr,msatoshi));
 }
 
 cJSON *chipsln_connect(char *ipaddr,uint16_t port,char *destid)
@@ -447,6 +450,7 @@ int32_t BET_havetable(bits256 pubkey,uint8_t *pubkey33,struct privatebet_info *b
         reqjson = cJSON_CreateObject();
         jaddbits256(reqjson,"pubkey",pubkey);
         jaddstr(reqjson,"method","join");
+        jaddstr(reqjson,"node_id",LN_idstr);
         BET_message_send("BET_havetable",bet->pushsock,reqjson,1);
         return(-1);
     }

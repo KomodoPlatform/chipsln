@@ -20,6 +20,9 @@ void BET_message_send(char *debugstr,int32_t sock,cJSON *msgjson,int32_t freefla
     if ( jobj(msgjson,"sender") != 0 )
         jdelete(msgjson,"sender");
     jaddbits256(msgjson,"sender",Mypubkey);
+    if ( jobj(msgjson,"node_id") != 0 )
+        jdelete(msgjson,"node_id");
+    jaddstr(msgjson,"node_id",LN_idstr);
     msg = jprint(msgjson,freeflag);
     len = (int32_t)strlen(msg) + 1;
     if ( (sendlen= nn_send(sock,msg,len,0)) != len )
