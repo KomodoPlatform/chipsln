@@ -32,9 +32,9 @@ bits256 Mypubkey,Myprivkey;
 
 #include "gfshare.c"
 #include "cards777.c"
+#include "network.c"
 #include "commands.c"
 #include "gameloop.c"
-#include "network.c"
 #include "states.c"
 
 // original shuffle with player 2 encrypting to destplayer
