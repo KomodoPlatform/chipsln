@@ -15,14 +15,26 @@
 
 char *chipsln_command(void *ctx,cJSON *argjson,char *remoteaddr,uint16_t port)
 {
-    int32_t n,numargs,maxsize = 1000000; char *args[16],*cmdstr,*buffer = malloc(maxsize);
+    cJSON *array; int32_t i,n,numargs,maxsize = 1000000; char *args[16],*buffer = malloc(maxsize);
+    memset(args,0,sizeof(args));
     numargs = 0;
     args[numargs++] = "chipsln";
     args[numargs++] = jstr(argjson,"method");
-    args[numargs] = 0;
-    cmdstr = jprint(argjson,0);
-    cli_main(buffer,maxsize,numargs,args,cmdstr);
-    free(cmdstr);
+    if ( (array= jarray(&n,argjson,"params")) != 0 )
+    {
+        for (i=0; i<n; i++)
+        {
+            item = jitem(array,i);
+            args[numargs++] = jprint(item,0);
+        }
+    }
+    cli_main(buffer,maxsize,numargs,args,0);
+    if ( numargs > 2 )
+    {
+        for (i=2; i<numargs; i++)
+            if ( args[i] != 0 )
+                free(args[i]);
+    }
     n = (int32_t)strlen(buffer);
     if ( buffer[n-1] == '\n' )
         buffer[n-1] = 0;
