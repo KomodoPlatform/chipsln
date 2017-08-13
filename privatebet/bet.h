@@ -286,7 +286,7 @@ cJSON *BET_statemachine_turni_actions(struct privatebet_info *bet,struct private
 void BET_statemachine_endround(struct privatebet_info *bet,struct privatebet_vars *vars);
 void BET_statemachine_roundstart(struct privatebet_info *bet,struct privatebet_vars *vars);
 void BET_statemachine_deali(struct privatebet_info *bet,struct privatebet_vars *vars,int32_t deali,int32_t playerj);
-int cli_main(char *buffer,int32_t maxsize,int argc, char *argv[]);
+int cli_main(char *buffer,int32_t maxsize,int argc, char *argv[],char *cmdstr);
 
 void stats_rpcloop(void *args);
 bits256 xoverz_donna(bits256 a);
