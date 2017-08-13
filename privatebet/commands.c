@@ -15,16 +15,18 @@
 
 char *chipsln_command(void *ctx,cJSON *argjson,char *remoteaddr,uint16_t port)
 {
-    int32_t numargs,maxsize = 1000000; char *args[16],*cmdstr,*buffer = malloc(maxsize);
+    int32_t n,numargs,maxsize = 1000000; char *args[16],*cmdstr,*buffer = malloc(maxsize);
     numargs = 0;
     args[numargs++] = "chipsln";
     args[numargs++] = jstr(argjson,"method");
     args[numargs] = 0;
     cmdstr = jprint(argjson,0);
-    if ( cli_main(buffer,maxsize,numargs,args,cmdstr) == 0 )
-        printf("cli_main.(%s)\n",buffer);
+    cli_main(buffer,maxsize,numargs,args,cmdstr);
     free(cmdstr);
-    buffer = realloc(buffer,strlen(buffer)+1);
+    n = (int32_t)strlen(buffer);
+    if ( buffer[n-1] == '\n' )
+        buffer[n-1] = 0;
+    buffer = realloc(buffer,n+1);
     return(buffer);
 }
 
