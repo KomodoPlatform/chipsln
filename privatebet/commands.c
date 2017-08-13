@@ -15,7 +15,7 @@
 
 char *chipsln_command(void *ctx,cJSON *argjson,char *remoteaddr,uint16_t port)
 {
-    cJSON *array; int32_t i,n,numargs,maxsize = 1000000; char *args[16],*buffer = malloc(maxsize);
+    cJSON *array,*item; int32_t i,n,numargs,maxsize = 1000000; char *args[16],*buffer = malloc(maxsize);
     memset(args,0,sizeof(args));
     numargs = 0;
     args[numargs++] = "chipsln";
