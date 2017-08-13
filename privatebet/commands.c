@@ -49,6 +49,7 @@ cJSON *chipsln_issue(char *buf)
 {
     char *retstr; cJSON *retjson,*argjson;
     argjson = cJSON_Parse(buf);
+    printf("parse.(%s) <- %s\n",jprint(argjson,0),buf);
     if ( (retstr= chipsln_command(0,argjson,"127.0.0.1",0)) != 0 )
     {
         retjson = cJSON_Parse(retstr);
