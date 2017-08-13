@@ -65,7 +65,7 @@ int main(int argc,const char *argv[])
     args[numargs++] = "cli_main";
     args[numargs++] = "getinfo";
     args[numargs] = 0;
-    if ( cli_main(buffer,maxsize,args,numargs) == 0 )
+    if ( cli_main(buffer,maxsize,numargs,args) == 0 )
         printf("cli_main.(%s)\n",buffer);
     if ( argc > 1 )
     {
