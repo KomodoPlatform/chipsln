@@ -93,38 +93,6 @@ bits256 *BET_process_packet(bits256 *cardpubs,bits256 *deckidp,bits256 senderpub
     return(-1);*/
 }
 
-void BET_message_send(char *debugstr,int32_t sock,cJSON *msgjson,int32_t freeflag)
-{
-    int32_t sendlen,len; char *msg;
-    if ( jobj(msgjson,"sender") != 0 )
-        jdelete(msgjson,"sender");
-    jaddbits256(msgjson,"sender",Mypubkey);
-    msg = jprint(msgjson,freeflag);
-    len = (int32_t)strlen(msg) + 1;
-    if ( (sendlen= nn_send(sock,msg,len,0)) != len )
-        printf("%s: sendlen.%d != recvlen.%d for %s, pushsock.%d\n",debugstr,sendlen,len,msg,sock);
-    //else printf("SEND.[%s]\n",msg);
-    free(msg);
-}
-
-void BET_broadcast(int32_t pubsock,uint8_t *decoded,int32_t maxsize,bits256 *playerprivs,bits256 *playerpubs,int32_t numplayers,int32_t numcards,uint8_t *sendbuf,int32_t size,bits256 deckid)
-{
-    int32_t i,slen; bits256 checkdeckid,cardpubs[CARDS777_MAXCARDS];
-    slen = (int32_t)strlen((char *)sendbuf);
-    if ( pubsock >= 0 )
-    {
-        nn_send(pubsock,sendbuf,size,0);
-    }
-    else if ( slen+1+sizeof(bits256) < size && playerprivs != 0 )
-    {
-        for (i=0; i<numplayers; i++)
-        {
-            if ( BET_process_packet(cardpubs,&checkdeckid,GENESIS_PUBKEY,playerprivs[i],decoded,maxsize,playerpubs[i],sendbuf,size,numplayers,numcards) != 0 )
-                break;
-        }
-    }
-}
-
 void BET_roundstart(int32_t pubsock,cJSON *deckjson,int32_t numcards,bits256 *privkeys,bits256 *playerpubs,int32_t numplayers,bits256 privkey0)
 {
     static uint8_t *decoded; static int32_t decodedlen;
