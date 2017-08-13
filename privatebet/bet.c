@@ -29,6 +29,10 @@ bits256 Mypubkey,Myprivkey;
 #include "../../SuperNET/iguana/exchanges/LP_secp.c"
 #include "../../SuperNET/iguana/exchanges/LP_bitcoin.c"
 
+void randombytes_buf(void * const buf, const size_t size)
+{
+    OS_randombytes((void *)buf,(int32_t)size);
+}
 
 #include "gfshare.c"
 #include "cards777.c"
