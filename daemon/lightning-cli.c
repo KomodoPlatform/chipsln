@@ -180,9 +180,9 @@ int cli_main(char *buffer,int32_t maxsize,int argc, char *argv[])
 		tal_free(ctx);
 		return 0;
 	}
-    if ( strlen(json_tok_contents(resp, error)) < maxlen )
+    if ( strlen(json_tok_contents(resp, error)) < maxsize )
         sprintf(buffer,"%.*s\n",json_tok_len(error), json_tok_contents(resp, error));
-    else sprintf(buffer,"{\"error\:\"return too big\"}");
+    else strcpy(buffer,"{\"error\":\"return too big\"}");
 	tal_free(ctx);
 	return 1;
 }
