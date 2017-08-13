@@ -78,7 +78,7 @@ cJSON *chipsln_newaddr() { return(chipsln_noargs("newaddr")); }
 cJSON *chipsln_getnodes() { return(chipsln_noargs("getnodes")); }
 cJSON *chipsln_getpeers() { return(chipsln_noargs("getpeers")); }
 cJSON *chipsln_getchannels() { return(chipsln_noargs("getchannels")); }
-cJSON *chipsln_dev-blockheight() { return(chipsln_noargs("dev-blockheight")); }
+cJSON *chipsln_devblockheight() { return(chipsln_noargs("dev-blockheight")); }
 
 cJSON *chipsln_listinvoice(char *label) { return(chipsln_strarg("listinvoice",label)); }
 cJSON *chipsln_delinvoice(char *label) { return(chipsln_strarg("delinvoice",label)); }
@@ -87,7 +87,7 @@ cJSON *chipsln_waitinvoice(char *label) { return(chipsln_strarg("waitinvoice",la
 
 cJSON *chipsln_getlog(char *level) { return(chipsln_strarg("getlog",level)); }
 cJSON *chipsln_close(char *idstr) { return(chipsln_strarg("close",idstr)); }
-cJSON *chipsln_dev-rhash(char *secret) { return(chipsln_strarg("dev-rhash",secret)); }
+cJSON *chipsln_devrhash(char *secret) { return(chipsln_strarg("dev-rhash",secret)); }
 cJSON *chipsln_addfunds(char *rawtx) { return(chipsln_strarg("addfunds",rawtx)); }
 
 cJSON *chipsln_getroute(char *idstr,uint64_t msatoshi)
