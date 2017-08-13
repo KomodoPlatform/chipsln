@@ -109,6 +109,8 @@ int main(int argc,const char *argv[])
             BET_transportname(0,connectaddr,hostip,port+1);
             pushsock = BET_nanosock(0,connectaddr,NN_PUSH);
             sleep(1);
+            printf("connect.(%s)\n",jprint(chipsln_connect(hostip,port,LN_idstr),1));
+
             printf("BET API running on %s:%u pub.%d sub.%d; pull.%d push.%d ipbits.%08x\n",hostip,port,pubsock,subsock,pullsock,pushsock,(uint32_t)calc_ipbits("5.9.102.210"));
             BET_mainloop(pubsock,pullsock,subsock,pushsock,jstr(argjson,"passphrase"));
         }
