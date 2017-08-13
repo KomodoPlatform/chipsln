@@ -102,6 +102,7 @@ int cli_main(char *buffer,int32_t maxsize,int argc, char *argv[],char *cmd)
                 tal_append_fmt(&cmd, ", ");
         }
         tal_append_fmt(&cmd, "] }");
+        printf("cli_main.(%s)\n",cmd);
     }
 	if (!write_all(fd, cmd, strlen(cmd)))
 		err(ERROR_TALKING_TO_LIGHTNINGD, "Writing command");
