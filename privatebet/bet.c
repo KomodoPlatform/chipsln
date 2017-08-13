@@ -60,7 +60,8 @@ int main(int argc,const char *argv[])
     portable_mutex_init(&LP_psockmutex);
     portable_mutex_init(&LP_messagemutex);
     portable_mutex_init(&BET_shardmutex);
-    printf("getinfo.(%s)\n",jprint(chips_getinfo(),1));
+    printf("getinfo.(%s)\n",jprint(chipsln_getinfo(),1));
+    printf("help.(%s)\n",jprint(chipsln_help(),1));
     if ( argc > 1 )
     {
         if ( (argjson= cJSON_Parse(argv[1])) != 0 )

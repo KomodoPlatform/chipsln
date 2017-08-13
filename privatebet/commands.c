@@ -55,9 +55,11 @@ char *chipsln_command(void *ctx,cJSON *argjson,char *remoteaddr,uint16_t port)
     return(buffer);
 }
 
-cJSON *chips_getinfo()
+cJSON *chipsln_noargs(char *method)
 {
-    char *retstr; cJSON *retjson,*argjson = cJSON_Parse("{\"method\":\"getinfo\"}");
+    char *retstr,buf[1024]; cJSON *retjson,*argjson;
+    sprintf(buf,"{\"method\":\"%s\"}",method);
+    argjson = cJSON_Parse(buf);
     if ( (retstr= chipsln_command(0,argjson,"127.0.0.1",0)) != 0 )
     {
         retjson = cJSON_Parse(retstr);
@@ -66,6 +68,9 @@ cJSON *chips_getinfo()
     free_json(argjson);
     return(retjson);
 }
+
+cJSON *chipsln_getinfo() { return(chipsln_noargs("getinfo")); }
+cJSON *chipsln_help() { return(chipsln_noargs("help")); }
 
 char *privatebet_command(void *ctx,cJSON *argjson,char *remoteaddr,uint16_t port)
 {
