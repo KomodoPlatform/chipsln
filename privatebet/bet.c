@@ -34,6 +34,7 @@ bits256 Mypubkey,Myprivkey;
 #include "cards777.c"
 #include "network.c"
 #include "commands.c"
+#include "client.c"
 #include "gameloop.c"
 #include "states.c"
 
