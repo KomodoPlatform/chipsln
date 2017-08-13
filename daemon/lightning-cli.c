@@ -2,7 +2,8 @@
  * Helper to submit via JSON-RPC and get back response.
  */
 
-#include "_lightning-cli.c"
+
+int cli_main(char *buffer,int32_t maxsize,int argc, char *argv[]);
 
 int main(int argc, char *argv[])
 {
