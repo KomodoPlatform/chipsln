@@ -28,6 +28,9 @@ char *chipsln_command(void *ctx,cJSON *argjson,char *remoteaddr,uint16_t port)
             args[numargs++] = jprint(item,0);
         }
     }
+    for (i=0; i<numargs; i++)
+        printf("(%s) ",args[i]);
+    printf(" <- %s\n",jprint(argjson,0));
     cli_main(buffer,maxsize,numargs,args,0);
     if ( numargs > 2 )
     {
