@@ -13,6 +13,21 @@
  *                                                                            *
  ******************************************************************************/
 
+char *chipsln_command(void *ctx,cJSON *argjson,char *remoteaddr,uint16_t port)
+{
+    int32_t numargs,maxsize = 1000000; char *args[16],*cmdstr,*buffer = malloc(maxsize);
+    numargs = 0;
+    args[numargs++] = "chipsln";
+    args[numargs++] = jstr(argjson,"method");
+    args[numargs] = 0;
+    cmdstr = jprint(argjson,0);
+    if ( cli_main(buffer,maxsize,numargs,args,cmdstr) == 0 )
+        printf("cli_main.(%s)\n",buffer);
+    free(cmdstr);
+    buffer = realloc(buffer,strlen(buffer)+1);
+    return(buffer);
+}
+
 char *privatebet_command(void *ctx,cJSON *argjson,char *remoteaddr,uint16_t port)
 {
     char *method;
@@ -41,6 +56,8 @@ char *stats_JSON(void *ctx,char *myipaddr,int32_t mypubsock,cJSON *argjson,char 
     {
         if ( strcmp(agent,"bet") == 0 )
             return(privatebet_command(ctx,argjson,remoteaddr,port));
+        else if ( strcmp(agent,"chipsln") == 0 )
+            return(chipsln_command(ctx,argjson,remoteaddr,port));
         else if ( strcmp(agent,"pangea") == 0 )
             return(pangea_command(ctx,argjson,remoteaddr,port));
         else return(clonestr("{\"error\":\"invalid agent\"}"));

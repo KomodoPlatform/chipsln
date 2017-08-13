@@ -19,7 +19,7 @@
 #define ERROR_FROM_LIGHTNINGD 1
 #define ERROR_TALKING_TO_LIGHTNINGD 2
 #define ERROR_USAGE 3
-int cli_main(char *buffer,int32_t maxsize,int argc, char *argv[]);
+int cli_main(char *buffer,int32_t maxsize,int argc, char *argv[],char *cmd);
 
 /* Tal wrappers for opt. */
 static void *opt_allocfn(size_t size)
@@ -48,7 +48,7 @@ char *netaddr_name(const tal_t *ctx, const struct netaddr *a)
 	return NULL;
 }
 
-int cli_main(char *buffer,int32_t maxsize,int argc, char *argv[])
+int cli_main(char *buffer,int32_t maxsize,int argc, char *argv[],char *cmd)
 {
 	int fd, i, off;
 	const char *method;
@@ -63,58 +63,46 @@ int cli_main(char *buffer,int32_t maxsize,int argc, char *argv[])
 	bool valid;
 
 	err_set_progname(argv[0]);
-
 	opt_set_alloc(opt_allocfn, tal_reallocfn, tal_freefn);
 	configdir_register_opts(ctx, &lightning_dir, &rpc_filename);
-
-	opt_register_noarg("--help|-h", opt_usage_and_exit,
-			   "<command> [<params>...]", "Show this message");
+	opt_register_noarg("--help|-h", opt_usage_and_exit,"<command> [<params>...]", "Show this message");
 	opt_register_version();
-
 	opt_early_parse(argc, argv, opt_log_stderr_exit);
 	opt_parse(&argc, argv, opt_log_stderr_exit);
-
 	method = argv[1];
 	if (!method)
-		errx(ERROR_USAGE, "Need at least one argument\n%s",
-		     opt_usage(argv[0], NULL));
-
+		errx(ERROR_USAGE, "Need at least one argument\n%s",opt_usage(argv[0], NULL));
 	if (chdir(lightning_dir) != 0)
-		err(ERROR_TALKING_TO_LIGHTNINGD, "Moving into '%s'",
-		    lightning_dir);
-
+		err(ERROR_TALKING_TO_LIGHTNINGD, "Moving into '%s'",lightning_dir);
 	fd = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (strlen(rpc_filename) + 1 > sizeof(addr.sun_path))
 		errx(ERROR_USAGE, "rpc filename '%s' too long", rpc_filename);
 	strcpy(addr.sun_path, rpc_filename);
 	addr.sun_family = AF_UNIX;
-
 	if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) != 0)
 		err(ERROR_TALKING_TO_LIGHTNINGD,
 		    "Connecting to '%s'", rpc_filename);
-
-	idstr = tal_fmt(ctx, "lightning-cli-%i", getpid());
-	cmd = tal_fmt(ctx,
-		      "{ \"method\" : \"%s\", \"id\" : \"%s\", \"params\" : [ ",
-		      method, idstr);
-
-	for (i = 2; i < argc; i++) {
-		/* Numbers, bools, objects and arrays are left unquoted,
-		 * and quoted things left alone. */
-		if (strspn(argv[i], "0123456789") == strlen(argv[i])
-		    || streq(argv[i], "true")
-		    || streq(argv[i], "false")
-		    || argv[i][0] == '{'
-		    || argv[i][0] == '['
-		    || argv[i][0] == '"')
-			tal_append_fmt(&cmd, "%s", argv[i]);
-		else
-			tal_append_fmt(&cmd, "\"%s\"", argv[i]);
-		if (i != argc - 1)
-			tal_append_fmt(&cmd, ", ");
-	}
-	tal_append_fmt(&cmd, "] }");
-
+    if ( cmd == 0 )
+    {
+        idstr = tal_fmt(ctx, "lightning-cli-%i", getpid());
+        cmd = tal_fmt(ctx,"{ \"method\" : \"%s\", \"id\" : \"%s\", \"params\" : [ ",method, idstr);
+        for (i = 2; i < argc; i++) {
+            /* Numbers, bools, objects and arrays are left unquoted,
+             * and quoted things left alone. */
+            if (strspn(argv[i], "0123456789") == strlen(argv[i])
+                || streq(argv[i], "true")
+                || streq(argv[i], "false")
+                || argv[i][0] == '{'
+                || argv[i][0] == '['
+                || argv[i][0] == '"')
+                tal_append_fmt(&cmd, "%s", argv[i]);
+            else
+                tal_append_fmt(&cmd, "\"%s\"", argv[i]);
+            if (i != argc - 1)
+                tal_append_fmt(&cmd, ", ");
+        }
+        tal_append_fmt(&cmd, "] }");
+    }
 	if (!write_all(fd, cmd, strlen(cmd)))
 		err(ERROR_TALKING_TO_LIGHTNINGD, "Writing command");
 
