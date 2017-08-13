@@ -1,5 +1,3 @@
-root@LP1:~/chipsln/privatebet# vi m_bet
-root@LP1:~/chipsln/privatebet# cat m_bet
 export ROOT="/root/SuperNET"
 export C777="$ROOT/crypto777"
 export IGUANA="$ROOT/iguana"
