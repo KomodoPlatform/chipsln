@@ -64,7 +64,7 @@ cJSON *chipsln_strnum(char *method,char *str,uint64_t num)
     return(chipsln_issue(buf));
 }
 
-cJSON *chipsln_numstr(char *method,char *str,uint64_t num)
+cJSON *chipsln_numstr(char *method,uint64_t num,char *str)
 {
     char buf[4096];
     sprintf(buf,"{\"method\":\"%s\",\"params\":[%llu, \"%s\"]}",method,(long long)num,str);
