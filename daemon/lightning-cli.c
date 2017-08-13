@@ -47,7 +47,7 @@ char *netaddr_name(const tal_t *ctx, const struct netaddr *a)
 	return NULL;
 }
 
-int main(int argc, char *argv[])
+int cli_main(char *buffer,int32_t maxsize,int argc, char *argv[])
 {
 	int fd, i, off;
 	const char *method;
@@ -180,9 +180,25 @@ int main(int argc, char *argv[])
 		tal_free(ctx);
 		return 0;
 	}
-
-	printf("%.*s\n",
-	       json_tok_len(error), json_tok_contents(resp, error));
+    if ( strlen(json_tok_contents(resp, error)) < maxlen )
+        sprintf(buffer,"%.*s\n",json_tok_len(error), json_tok_contents(resp, error));
+    else sprintf(buffer,"{\"error\:\"return too big\"}");
 	tal_free(ctx);
 	return 1;
 }
+
+int main(int argc, char *argv[])
+{
+    int32_t retval = -1,maxsize = 1000000; char *buffer = malloc(maxsize);
+    if ( buffer != 0 )
+    {
+        if ( cli_main(buffer,maxsize,argc,argv) > 0 )
+        {
+            printf("%s\n",buffer);
+            retval = 1;
+        } else printf("error from cli_main\n");
+        free(buffer);
+    }
+    return(retval);
+}
+
