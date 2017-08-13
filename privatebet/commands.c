@@ -119,7 +119,7 @@ cJSON *chipsln_connect(char *ipaddr,uint16_t port,char *destid)
 
 cJSON *chipsln_sendpay(cJSON *routejson,bits256 rhash)
 {
-    char buf[16384];
+    char buf[16384],str[65];
     sprintf(buf,"{\"method\":\"sendpay\",\"params\":[%s, \"%s\"]}",jprint(routejson,0),bits256_str(str,rhash));
     return(chipsln_issue(buf));
 }
