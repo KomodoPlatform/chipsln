@@ -220,16 +220,16 @@ https://crypto.stanford.edu/~pgolle/papers/poker.pdf
 #include <stdio.h>
 #include <stdint.h>
 
-#include "../../../SuperNET/crypto777/OS_portable.h"
-#include "../../../SuperNET/iguana/exchanges/LP_include.h"
+#include "../../SuperNET/crypto777/OS_portable.h"
+#include "../../SuperNET/iguana/exchanges/LP_include.h"
 #if defined(WIN32) || defined(USE_STATIC_NANOMSG)
-#include "../../../SuperNET/crypto777/nanosrc/nn.h"
-#include "../../../SuperNET/crypto777/nanosrc/bus.h"
-#include "../../../SuperNET/crypto777/nanosrc/pubsub.h"
-#include "../../../SuperNET/crypto777/nanosrc/pipeline.h"
-#include "../../../SuperNET/crypto777/nanosrc/reqrep.h"
-#include "../../../SuperNET/crypto777/nanosrc/tcp.h"
-#include "../../../SuperNET/crypto777/nanosrc/pair.h"
+#include "../../SuperNET/crypto777/nanosrc/nn.h"
+#include "../../SuperNET/crypto777/nanosrc/bus.h"
+#include "../../SuperNET/crypto777/nanosrc/pubsub.h"
+#include "../../SuperNET/crypto777/nanosrc/pipeline.h"
+#include "../../SuperNET/crypto777/nanosrc/reqrep.h"
+#include "../../SuperNET/crypto777/nanosrc/tcp.h"
+#include "../../SuperNET/crypto777/nanosrc/pair.h"
 #else
 #include "/usr/local/include/nanomsg/nn.h"
 #include "/usr/local/include/nanomsg/bus.h"
@@ -291,8 +291,8 @@ bits256 xoverz_donna(bits256 a);
 bits256 crecip_donna(bits256 a);
 bits256 fmul_donna(bits256 a,bits256 b);
 
-#include "../../../SuperNET/iguana/exchanges/LP_network.c"
-#include "../../../SuperNET/iguana/exchanges/LP_secp.c"
-#include "../../../SuperNET/iguana/exchanges/LP_bitcoin.c"
+#include "../../SuperNET/iguana/exchanges/LP_network.c"
+#include "../../SuperNET/iguana/exchanges/LP_secp.c"
+#include "../../SuperNET/iguana/exchanges/LP_bitcoin.c"
 
 
