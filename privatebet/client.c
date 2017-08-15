@@ -284,3 +284,45 @@ int32_t BET_clientupdate(cJSON *argjson,uint8_t *ptr,int32_t recvlen,struct priv
     } else printf("clientupdate unexpected.(%s)\n",jprint(argjson,0));
     return(-1);
 }
+
+void BET_clientloop(void *_ptr)
+{
+    int32_t nonz,recvlen; uint16_t port=0; char connectaddr[64],hostip[64]; void *ptr; cJSON *msgjson; struct privatebet_vars *VARS; struct privatebet_info *bet = _ptr;
+    VARS = calloc(1,sizeof(*VARS));
+    hostip[0] = 0;
+    printf("client loop: pushsock.%d subsock.%d\n",bet->pushsock,bet->subsock);
+    while ( 1 )
+    {
+        if ( bet->subsock >= 0 && bet->pushsock >= 0 )
+        {
+            nonz = 0;
+            if ( (recvlen= nn_recv(bet->subsock,&ptr,NN_MSG,0)) > 0 )
+            {
+                nonz++;
+                if ( (msgjson= cJSON_Parse(ptr)) != 0 )
+                {
+                    if ( BET_clientupdate(msgjson,ptr,recvlen,bet,VARS) < 0 )
+                        printf("unknown clientupdate msg.(%s)\n",jprint(msgjson,0));
+                    free_json(msgjson);
+                }
+                nn_freemsg(ptr);
+            }
+            if ( nonz == 0 )
+                usleep(10000);
+        }
+        else if ( hostip[0] != 0 && port > 0 )
+        {
+            BET_transportname(0,connectaddr,hostip,port);
+            printf("connect %s\n",connectaddr);
+            bet->subsock = BET_nanosock(0,connectaddr,NN_SUB);
+            BET_transportname(0,connectaddr,hostip,port+1);
+            bet->pushsock = BET_nanosock(0,connectaddr,NN_PUSH);
+        }
+        else
+        {
+            // update list of tables
+        }
+    }
+}
+
+

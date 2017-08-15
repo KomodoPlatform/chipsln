@@ -1,0 +1,227 @@
+/******************************************************************************
+ * Copyright © 2014-2018 The SuperNET Developers.                             *
+ *                                                                            *
+ * See the AUTHORS, DEVELOPER-AGREEMENT and LICENSE files at                  *
+ * the top-level directory of this distribution for the individual copyright  *
+ * holder information and the developer policies on copyright and licensing.  *
+ *                                                                            *
+ * Unless otherwise agreed in a custom licensing agreement, no part of the    *
+ * SuperNET software, including this file may be copied, modified, propagated *
+ * or distributed except according to the terms contained in the LICENSE file *
+ *                                                                            *
+ * Removal or modification of this copyright notice is prohibited.            *
+ *                                                                            *
+ ******************************************************************************/
+
+
+int32_t BET_host_join(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars)
+{
+    bits256 pubkey; int32_t n;
+    pubkey = jbits256(argjson,"pubkey");
+    if ( bits256_nonz(pubkey) != 0 )
+    {
+        //printf("JOIN.(%s)\n",jprint(argjson,0));
+        if ( bits256_nonz(bet->tableid) == 0 )
+            bet->tableid = Mypubkey;
+        if ( BET_pubkeyfind(bet,pubkey) < 0 )
+        {
+            if ( (n= BET_pubkeyadd(bet,pubkey)) > 0 )
+            {
+                if ( n > 1 )
+                {
+                    Gamestart = (uint32_t)time(NULL);
+                    if ( n < bet->maxplayers )
+                        Gamestart += BET_GAMESTART_DELAY;
+                    printf("Gamestart in a %d seconds\n",BET_GAMESTART_DELAY);
+                } else printf("Gamestart after second player joins or we get maxplayers.%d\n",bet->maxplayers);
+                return(1);
+            } else return(0);
+        }
+    }
+    return(0);
+}
+
+int32_t BET_hostcommand(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars)
+{
+    char *method;
+    if ( (method= jstr(argjson,"method")) != 0 )
+    {
+        if ( strcmp(method,"join") == 0 )
+            return(BET_host_join(argjson,bet,vars));
+        else if ( strcmp(method,"tablestatus") == 0 )
+            return(0);
+        else return(1);
+    }
+    return(-1);
+}
+
+void BET_host_gamestart(struct privatebet_info *bet,struct privatebet_vars *vars)
+{
+    cJSON *deckjson,*reqjson; char *retstr;
+    reqjson = cJSON_CreateObject();
+    jaddstr(reqjson,"method","start0");
+    jaddnum(reqjson,"numplayers",bet->numplayers);
+    jaddnum(reqjson,"numrounds",bet->numrounds);
+    jaddnum(reqjson,"range",bet->range);
+    BET_message_send("BET_start",bet->pubsock,reqjson,1);
+    deckjson = 0;
+    if ( (reqjson= BET_createdeck_request(bet->playerpubs,bet->numplayers,bet->range)) != 0 )
+    {
+        if ( (retstr= BET_oracle_request("createdeck",reqjson)) != 0 )
+        {
+            if ( (deckjson= cJSON_Parse(retstr)) != 0 )
+            {
+                printf("BET_roundstart numcards.%d numplayers.%d\n",bet->range,bet->numplayers);
+                BET_roundstart(bet->pubsock,deckjson,bet->range,0,bet->playerpubs,bet->numplayers,Myprivkey);
+                printf("finished BET_roundstart numcards.%d numplayers.%d\n",bet->range,bet->numplayers);
+            }
+            free(retstr);
+        }
+        free_json(reqjson);
+    }
+    printf("Gamestart.%u vs %u Numplayers.%d ",Gamestart,(uint32_t)time(NULL),bet->numplayers);
+    printf("Range.%d numplayers.%d numrounds.%d\n",bet->range,bet->numplayers,bet->numrounds);
+    BET_tablestatus_send(bet,vars);
+    Lastturni = (uint32_t)time(NULL);
+    vars->turni = 0;
+    vars->round = 0;
+    reqjson = cJSON_CreateObject();
+    jaddstr(reqjson,"method","start");
+    jaddnum(reqjson,"numplayers",bet->numplayers);
+    jaddnum(reqjson,"numrounds",bet->numrounds);
+    jaddnum(reqjson,"range",bet->range);
+    BET_message_send("BET_start",bet->pubsock,reqjson,1);
+}
+
+/*
+ Cashier: get/newaddr, <deposit>, display balance, withdraw
+ 
+ Table info: host addr, chipsize, gameinfo, maxchips, minplayers, maxplayers, numplayers, bankroll, performance bond, history, timeout
+ 
+ Join table/numchips: connect to host, open channel with numchips*chipsize, getchannel to verify, getroute
+ 
+ Host: for each channel create numchips invoices.(playerid/tableid/i) for chipsize -> return json with rhashes[]
+ 
+ Player: send one chip as tip and to verify all is working, get elapsed time
+
+Hostloop:
+{
+    if ( newpeer (via getpeers) )
+        activate player
+    if ( incoming chip )
+    {
+        if initial tip, update state to ready
+        if ( game in progress )
+            broadcast bet received
+    }
+}
+ 
+ Making a bet:
+    player picks host's rhash, generates own rhash, sends to host
+ 
+ HOST: recv:[{rhash0[m]}, {rhash1[m]}, ... ], sends[] <- {rhashi[m]}
+ Players[]: recv:[{rhash0[m]}, {rhash1[m]}, ... ], send:{rhashi[m]}
+ 
+    host: verifies rhash is from valid player, broadcasts new rhash
+ 
+ each node with M chips should have MAXCHIPS-M rhashes published
+ when node gets chip, M ->M+1, invalidate corresponding rhash
+ when node sends chip, M -> M-1, need to create a new rhash
+*/
+
+void BETS_players_update(struct privatebet_info *bet,struct privatebet_vars *vars)
+{
+    int32_t i; struct privatebet_player *p;
+    for (i=0; i<bet->numplayers; i++)
+    {
+        p = &vars->players[i];
+        /*update state: new, initial tip, active lasttime, missing, dead
+        if ( dead for more than 5 minutes )
+            close channel (settles chips)*/
+        /* if ( (0) && time(NULL) > Lastturni+BET_PLAYERTIMEOUT )
+        {
+            timeoutjson = cJSON_CreateObject();
+            jaddstr(timeoutjson,"method","turni");
+            jaddnum(timeoutjson,"round",VARS->round);
+            jaddnum(timeoutjson,"turni",VARS->turni);
+            jaddbits256(timeoutjson,"pubkey",bet->playerpubs[VARS->turni]);
+            jadd(timeoutjson,"actions",cJSON_Parse("[\"timeout\"]"));
+            BET_message_send("TIMEOUT",bet->pubsock,timeoutjson,1);
+            //BET_host_turni_next(bet,&VARS);
+        }*/
+    }
+}
+
+int32_t BET_chipsln_update(struct privatebet_info *bet,struct privatebet_vars *vars)
+{
+    cJSON *peers,*channels,*invoices; int32_t isnew = 0,waspad = 0;
+    if ( (peers= chipsln_getpeers()) != 0 )
+    {
+        //{ "peers" : [ { "unique_id" : 0, "state" : "CHANNELD_NORMAL", "netaddr" : "5.9.253.195:9735", "peerid" : "02779b57b66706778aa1c7308a817dc080295f3c2a6af349bb1114b8be328c28dc", "channel" : "2646:1:0", "msatoshi_to_us" : 9999000, "msatoshi_total" : 10000000 } ] }
+        if ( (channels= chipsln_getchannels()) != 0 )
+        {
+            if ( (invoices= chipsln_listinvoice("")) != 0 )
+            {
+                // update player info
+                if ( isnew != 0 )
+                {
+                    // send rhashes
+                    // request rhashes
+                }
+                if ( waspaid != 0 )
+                {
+                    // find player
+                    // p->hostfee <- first
+                    // p->tablebet <- sendpays
+                    // broadcast bet amount
+                }
+                free_json(invoices);
+            }
+            free_json(channels);
+        }
+        free_json(peers);
+    }
+    return(0);
+}
+
+void BET_hostloop(void *_ptr)
+{
+    uint32_t lasttime = 0; uint8_t r; int32_t nonz,recvlen,sendlen; cJSON *argjson,*timeoutjson; void *ptr; struct privatebet_info *bet = _ptr; struct privatebet_vars *VARS;
+    VARS = calloc(1,sizeof(*VARS));
+    printf("hostloop pubsock.%d pullsock.%d range.%d\n",bet->pubsock,bet->pullsock,bet->range);
+    while ( bet->pullsock >= 0 && bet->pubsock >= 0 )
+    {
+        nonz = 0;
+        if ( (recvlen= nn_recv(bet->pullsock,&ptr,NN_MSG,0)) > 0 )
+        {
+            nonz++;
+            if ( (argjson= cJSON_Parse(ptr)) != 0 )
+            {
+                if ( BET_hostcommand(argjson,bet,VARS) != 0 ) // usually just relay to players
+                {
+                    if ( (sendlen= nn_send(bet->pubsock,ptr,recvlen,0)) != recvlen )
+                        printf("sendlen.%d != recvlen.%d for %s\n",sendlen,recvlen,jprint(argjson,0));
+                }
+                free_json(argjson);
+            }
+            nn_freemsg(ptr);
+        }
+        if ( nonz == 0 )
+        {
+            if ( BET_chipsln_update(bet,vars) == 0 )
+            {
+                BETS_players_update(bet,vars);
+                usleep(100000);
+            }
+        }
+        if ( Gamestarted == 0 )
+        {
+            //printf(">>>>>>>>> t%u gamestart.%u numplayers.%d turni.%d round.%d\n",(uint32_t)time(NULL),Gamestart,bet->numplayers,VARS.turni,VARS.round);
+            if ( time(NULL) > Gamestart && bet->numplayers > 1 && VARS->turni == 0 && VARS->round == 0 )
+            {
+                Gamestarted = (uint32_t)time(NULL);
+                BET_host_gamestart(bet,VARS);
+            }
+        }
+    }
+}

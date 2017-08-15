@@ -243,6 +243,7 @@ https://crypto.stanford.edu/~pgolle/papers/poker.pdf
 #define CARDS777_MAXCARDS 255 //52    //
 #define CARDS777_MAXPLAYERS 2 //9   //
 #define CARDS777_MAXROUNDS 3 //9   //
+#define CARDS777_MAXCHIPS 100 
 #define BET_PLAYERTIMEOUT 15
 #define BET_GAMESTART_DELAY 3
 
@@ -268,10 +269,24 @@ struct privatebet_info
     int32_t pullsock,pubsock,subsock,pushsock;
 };
 
+struct privatebet_rhashes
+{
+    int32_t numrhashes,numpaid,paid[CARDS777_MAXCHIPS * CARDS777_MAXPLAYERS];
+    bits256 rhashes[CARDS777_MAXCHIPS * CARDS777_MAXPLAYERS];
+};
+
+struct privatebet_player
+{
+    int32_t state;
+    struct privatebet_rhashes sendchips,recvchips;
+    char ln_id[67],channel[64],netaddr[64];
+};
+
 struct privatebet_vars
 {
     bits256 myhash,hashes[CARDS777_MAXPLAYERS][2];
     int32_t permis[CARDS777_MAXPLAYERS][CARDS777_MAXCARDS];
+    struct privatebet_player players[CARDS777_MAXPLAYERS];
     uint32_t endround[CARDS777_MAXPLAYERS];
     cJSON *actions[CARDS777_MAXROUNDS][CARDS777_MAXPLAYERS];
     int32_t mypermi[CARDS777_MAXCARDS],permi[CARDS777_MAXCARDS],turni,round,validperms,roundready;
@@ -280,7 +295,7 @@ bits256 *BET_process_packet(bits256 *cardpubs,bits256 *deckidp,bits256 senderpub
 
 int32_t BET_clientupdate(cJSON *argjson,uint8_t *ptr,int32_t recvlen,struct privatebet_info *bet,struct privatebet_vars *vars);
 int32_t BET_hostcommand(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars);
-void BET_cmdloop(bits256 privkey,char *smartaddr,uint8_t *pubkey33,bits256 pubkey,struct privatebet_info *bet);
+//void BET_cmdloop(bits256 privkey,char *smartaddr,uint8_t *pubkey33,bits256 pubkey,struct privatebet_info *bet);
 cJSON *BET_statemachine_gamestart_actions(struct privatebet_info *bet,struct privatebet_vars *vars);
 cJSON *BET_statemachine_turni_actions(struct privatebet_info *bet,struct privatebet_vars *vars);
 void BET_statemachine_endround(struct privatebet_info *bet,struct privatebet_vars *vars);

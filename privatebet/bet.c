@@ -15,13 +15,13 @@
 
 
 #include "bet.h"
-char *LN_idstr;
+char *LN_idstr,BET_ORACLEURL[64] = "127.0.0.1:7797";
 int32_t Gamestart,Gamestarted,Lastturni,Maxrounds = 3,Maxplayers = 2;
 uint8_t BET_logs[256],BET_exps[510];
 bits256 *Debug_privkeys;
 struct BET_shardsinfo *BET_shardsinfos;
 portable_mutex_t LP_peermutex,LP_commandmutex,LP_networkmutex,LP_psockmutex,LP_messagemutex,BET_shardmutex;
-int32_t LP_canbind,IAMLP;
+int32_t LP_canbind,IAMLP,IAMHOST,IAMORACLE;
 struct LP_peerinfo  *LP_peerinfos,*LP_mypeer;
 bits256 Mypubkey,Myprivkey;
 
@@ -38,20 +38,24 @@ void randombytes_buf(void * const buf, const size_t size)
 #include "cards777.c"
 #include "network.c"
 #include "commands.c"
+#include "oracle.c"
+#include "table.c"
 #include "client.c"
-#include "gameloop.c"
+#include "host"
 #include "states.c"
 
 // original shuffle with player 2 encrypting to destplayer
 // autodisconnect
-// payments/bets
+// payments/bets -> separate dealer from pub0
 // virtualize games
 // privatebet host -> publish to BET chain
 // tableid management -> leave, select game, start game
 
 int main(int argc,const char *argv[])
 {
-    char connectaddr[128],bindaddr[128],*modestr,*hostip="127.0.0.1",*retstr; cJSON *infojson,*argjson,*reqjson,*deckjson; bits256 pubkeys[64],privkeys[64]; uint32_t i,n,range,numplayers; int32_t testmode=0,pubsock=-1,subsock=-1,pullsock=-1,pushsock=-1; long fsize; uint16_t tmp,rpcport=7797,port = 7797+1;
+    uint16_t tmp,rpcport = 7797,port = 7797+1;
+    char connectaddr[128],bindaddr[128],smartaddr[64],randphrase[32],*modestr,*hostip,*retstr; cJSON *infojson,*argjson,*reqjson,*deckjson; uint64_t randvals; bits256 privkey,pubkey,pubkeys[64],privkeys[64]; uint8_t pubkey33[33],taddr=0,pubtype=60; uint32_t i,n,range,numplayers; int32_t testmode=0,pubsock=-1,subsock=-1,pullsock=-1,pushsock=-1; long fsize; struct privatebet_info *BET,*BET2;
+    hostip = "127.0.0.1";
     libgfshare_init();
     OS_init();
     portable_mutex_init(&LP_peermutex);
@@ -77,6 +81,11 @@ int main(int argc,const char *argv[])
                 port = tmp;
             if ( (tmp= juint(argjson,"rpcport")) != 0 )
                 rpcport = tmp;
+            if ( OS_thread_create(malloc(sizeof(pthread_t)),NULL,(void *)stats_rpcloop,(void *)&rpcport) != 0 )
+            {
+                printf("error launching stats rpcloop for port.%u\n",port);
+                exit(-1);
+            }
             if ( (modestr= jstr(argjson,"mode")) != 0 )
             {
                 if ( strcmp(modestr,"host") == 0 )
@@ -94,25 +103,74 @@ int main(int argc,const char *argv[])
                     pubsock = BET_nanosock(1,bindaddr,NN_PUB);
                     BET_transportname(1,bindaddr,hostip,port+1);
                     pullsock = BET_nanosock(1,bindaddr,NN_PULL);
-                    if ( OS_thread_create(malloc(sizeof(pthread_t)),NULL,(void *)stats_rpcloop,(void *)&rpcport) != 0 )
-                    {
-                        printf("error launching stats rpcloop for port.%u\n",port);
-                        exit(-1);
-                    }
+                    IAMHOST = 1;
+                    // publish to BET chain
+                    BET_maininit(pubsock,pullsock,subsock,pushsock,jstr(argjson,"passphrase"));
+                }
+                else if ( strcmp(modestr,"oracle") == 0 )
+                {
+                    IAMORACLE = 1;
+                    while ( 1 )     // just respond to oracle requests
+                        sleep(777);
                 }
             }
-            if ( hostip == 0 || hostip[0] == 0 )
-                hostip = "127.0.0.1";
-            BET_transportname(0,connectaddr,hostip,port);
-            printf("connect %s\n",connectaddr);
-            subsock = BET_nanosock(0,connectaddr,NN_SUB);
-            BET_transportname(0,connectaddr,hostip,port+1);
-            pushsock = BET_nanosock(0,connectaddr,NN_PUSH);
-            sleep(1);
-            printf("connect.(%s)\n",jprint(chipsln_connect(hostip,port,LN_idstr),1));
-
             printf("BET API running on %s:%u pub.%d sub.%d; pull.%d push.%d ipbits.%08x\n",hostip,port,pubsock,subsock,pullsock,pushsock,(uint32_t)calc_ipbits("5.9.102.210"));
-            BET_mainloop(pubsock,pullsock,subsock,pushsock,jstr(argjson,"passphrase"));
+            BET = calloc(1,sizeof(*BET));
+            BET2 = calloc(1,sizeof(*BET2));
+            BET->pubsock = pubsock;
+            BET->pullsock = pullsock;
+            BET->subsock = subsock;
+            BET->pushsock = pushsock;
+            *BET2 = *BET;
+            if ( passphrase == 0 || passphrase[0] == 0 )
+            {
+                passphrase = OS_filestr(&fsize,"passphrase");
+                if ( passphrase == 0 || passphrase[0] == 0 )
+                {
+                    OS_randombytes((void *)&randvals,sizeof(randvals));
+                    sprintf(randphrase,"%llu",(long long)randvals);
+                    printf("randphrase.(%s)\n",randphrase);
+                    passphrase = randphrase;
+                }
+            }
+            printf("passphrase.(%s) pushsock.%d subsock.%d\n",passphrase,pushsock,subsock);
+            conv_NXTpassword(privkey.bytes,pubkey.bytes,(uint8_t *)passphrase,(int32_t)strlen(passphrase));
+            bitcoin_priv2pub(bitcoin_ctx(),pubkey33,smartaddr,privkey,taddr,pubtype);
+            Mypubkey = pubkey;
+            Myprivkey = privkey;
+            if ( IAMDEALER != 0 )
+            {
+                BET_betinfo_set(BET,"demo",36,0,Maxplayers);
+                if ( OS_thread_create(malloc(sizeof(pthread_t)),NULL,(void *)BET_hostloop,(void *)BET) != 0 )
+                {
+                    printf("error launching BET_hostloop for pub.%d pull.%d\n",BET->pubsock,BET->pullsock);
+                    exit(-1);
+                }
+            }
+            else
+            {
+                if ( OS_thread_create(malloc(sizeof(pthread_t)),NULL,(void *)BET_clientloop,(void *)BET) != 0 )
+                {
+                    printf("error launching BET_clientloop for sub.%d\n",BET->subsock);
+                    exit(-1);
+                }
+            }
+            while ( 1 )
+            {
+                sleep(1);
+                // update display
+            }
+            //BET_cmdloop(privkey,smartaddr,pubkey33,pubkey,BET2);
+            /*if ( hostip == 0 || hostip[0] == 0 )
+             hostip = "127.0.0.1";
+             BET_transportname(0,connectaddr,hostip,port);
+             printf("connect %s\n",connectaddr);
+             subsock = BET_nanosock(0,connectaddr,NN_SUB);
+             BET_transportname(0,connectaddr,hostip,port+1);
+             pushsock = BET_nanosock(0,connectaddr,NN_PUSH);
+             sleep(1);*/
+            // printf("connect.(%s)\n",jprint(chipsln_connect(hostip,port,LN_idstr),1));
+            //BET_mainloop(pubsock,pullsock,subsock,pushsock,jstr(argjson,"passphrase"));
         }
     }
     else
@@ -128,9 +186,9 @@ int main(int argc,const char *argv[])
                 privkeys[i] = curve25519_keypair(&pubkeys[i]);
             //Debug_privkeys = privkeys;
             deckjson = 0;
-            if ( (reqjson= BET_createdeck_json(pubkeys,numplayers,range)) != 0 )
+            if ( (reqjson= BET_createdeck_request(pubkeys,numplayers,range)) != 0 )
             {
-                if ( (retstr= BET_command("createdeck",reqjson)) != 0 )
+                if ( (retstr= BET_oracle_request("createdeck",reqjson)) != 0 )
                 {
                     if ( (deckjson= cJSON_Parse(retstr)) != 0 )
                     {
