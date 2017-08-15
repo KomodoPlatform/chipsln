@@ -41,7 +41,7 @@ void randombytes_buf(void * const buf, const size_t size)
 #include "commands.c"
 #include "table.c"
 #include "client.c"
-#include "host"
+#include "host.c"
 #include "states.c"
 
 // original shuffle with player 2 encrypting to destplayer
