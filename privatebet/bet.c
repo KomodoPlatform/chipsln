@@ -54,7 +54,7 @@ void randombytes_buf(void * const buf, const size_t size)
 int main(int argc,const char *argv[])
 {
     uint16_t tmp,rpcport = 7797,port = 7797+1;
-    char connectaddr[128],bindaddr[128],smartaddr[64],randphrase[32],*modestr,*hostip,*retstr; cJSON *infojson,*argjson,*reqjson,*deckjson; uint64_t randvals; bits256 privkey,pubkey,pubkeys[64],privkeys[64]; uint8_t pubkey33[33],taddr=0,pubtype=60; uint32_t i,n,range,numplayers; int32_t testmode=0,pubsock=-1,subsock=-1,pullsock=-1,pushsock=-1; long fsize; struct privatebet_info *BET,*BET2;
+    char connectaddr[128],bindaddr[128],smartaddr[64],randphrase[32],*modestr,*hostip,*passphrase,*retstr; cJSON *infojson,*argjson,*reqjson,*deckjson; uint64_t randvals; bits256 privkey,pubkey,pubkeys[64],privkeys[64]; uint8_t pubkey33[33],taddr=0,pubtype=60; uint32_t i,n,range,numplayers; int32_t testmode=0,pubsock=-1,subsock=-1,pullsock=-1,pushsock=-1; long fsize; struct privatebet_info *BET,*BET2;
     hostip = "127.0.0.1";
     libgfshare_init();
     OS_init();
@@ -105,7 +105,6 @@ int main(int argc,const char *argv[])
                     pullsock = BET_nanosock(1,bindaddr,NN_PULL);
                     IAMHOST = 1;
                     // publish to BET chain
-                    BET_maininit(pubsock,pullsock,subsock,pushsock,jstr(argjson,"passphrase"));
                 }
                 else if ( strcmp(modestr,"oracle") == 0 )
                 {
@@ -138,7 +137,7 @@ int main(int argc,const char *argv[])
             bitcoin_priv2pub(bitcoin_ctx(),pubkey33,smartaddr,privkey,taddr,pubtype);
             Mypubkey = pubkey;
             Myprivkey = privkey;
-            if ( IAMDEALER != 0 )
+            if ( IAMHOST != 0 )
             {
                 BET_betinfo_set(BET,"demo",36,0,Maxplayers);
                 if ( OS_thread_create(malloc(sizeof(pthread_t)),NULL,(void *)BET_hostloop,(void *)BET) != 0 )
