@@ -148,7 +148,7 @@ char *privatebet_command(void *ctx,cJSON *argjson,char *remoteaddr,uint16_t port
     if ( (method= jstr(argjson,"method")) != 0 )
     {
         if ( IAMORACLE != 0 )
-            return(BET_oracle_command(ctx,argjson));
+            return(BET_oracle_command(ctx,method,argjson));
         else if ( IAMHOST != 0 )
         {
         }

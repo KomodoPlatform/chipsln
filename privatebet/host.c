@@ -154,7 +154,7 @@ void BETS_players_update(struct privatebet_info *bet,struct privatebet_vars *var
 
 int32_t BET_chipsln_update(struct privatebet_info *bet,struct privatebet_vars *vars)
 {
-    cJSON *peers,*channels,*invoices; int32_t isnew = 0,waspad = 0;
+    cJSON *peers,*channels,*invoices; int32_t isnew = 0,waspaid = 0;
     if ( (peers= chipsln_getpeers()) != 0 )
     {
         //{ "peers" : [ { "unique_id" : 0, "state" : "CHANNELD_NORMAL", "netaddr" : "5.9.253.195:9735", "peerid" : "02779b57b66706778aa1c7308a817dc080295f3c2a6af349bb1114b8be328c28dc", "channel" : "2646:1:0", "msatoshi_to_us" : 9999000, "msatoshi_total" : 10000000 } ] }
@@ -208,9 +208,9 @@ void BET_hostloop(void *_ptr)
         }
         if ( nonz == 0 )
         {
-            if ( BET_chipsln_update(bet,vars) == 0 )
+            if ( BET_chipsln_update(bet,VARS) == 0 )
             {
-                BETS_players_update(bet,vars);
+                BETS_players_update(bet,VARS);
                 usleep(100000);
             }
         }
