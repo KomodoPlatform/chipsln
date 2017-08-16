@@ -66,7 +66,7 @@ int32_t BET_host_join(cJSON *argjson,struct privatebet_info *bet,struct privateb
             }
             if ( p != 0 )
             {
-                sprintf(label,"%s_%d",LN_idstr,0);
+                sprintf(label,"%s_%d",peerid,0);
                 p->hostrhash = chipsln_rhash_create(bet->chipsize,label);
                 p->clientrhash = clientrhash;
                 p->clientpubkey = pubkey;
