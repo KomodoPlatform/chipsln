@@ -263,6 +263,7 @@ void BET_hostloop(void *_ptr)
     printf("hostloop pubsock.%d pullsock.%d range.%d\n",bet->pubsock,bet->pullsock,bet->range);
     while ( bet->pullsock >= 0 && bet->pubsock >= 0 )
     {
+        printf("hostiter\n");
         nonz = 0;
         if ( (recvlen= nn_recv(bet->pullsock,&ptr,NN_MSG,0)) > 0 )
         {
@@ -283,8 +284,8 @@ void BET_hostloop(void *_ptr)
             if ( BET_chipsln_update(bet,VARS) == 0 )
             {
                 //BETS_players_update(bet,VARS);
-                usleep(100000);
             }
+            sleep(3);
         }
         if ( Gamestarted == 0 )
         {
