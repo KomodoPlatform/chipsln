@@ -32,7 +32,7 @@ struct privatebet_peerln *BET_peerln_find(char *peerid)
 struct privatebet_peerln *BET_peerln_create(struct privatebet_rawpeerln *raw,int32_t maxplayers,int32_t maxchips,int32_t chipsize)
 {
     struct privatebet_peerln *p; cJSON *inv; char label[64];
-    if ( (p= BET_peerln_find(raw.peerid)) == 0 )
+    if ( (p= BET_peerln_find(raw->peerid)) == 0 )
     {
         p = &Peersln[Num_peersln++];
         p->raw = *raw;
@@ -66,7 +66,7 @@ int32_t BET_host_join(cJSON *argjson,struct privatebet_info *bet,struct privateb
                     {
                         p = &Peersln[Num_peersln++];
                         memset(p,0,sizeof(*p));
-                        safecopy(p->peerid,peerid,sizeof(p->peerid));
+                        safecopy(p->raw.peerid,peerid,sizeof(p->raw.peerid));
                         sprintf(label,"%s_%d",LN_idstr,0);
                         p->hostrhash = chipsln_rhash_create(bet->chipsize,label);
                     }
