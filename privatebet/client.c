@@ -38,7 +38,7 @@ void BET_client_turnisend(struct privatebet_info *bet,struct privatebet_vars *va
         jaddnum(cmdjson,"turni",vars->turni);
         jaddbits256(cmdjson,"pubkey",Mypubkey);
         jadd(cmdjson,"actions",BET_statemachine_turni_actions(bet,vars));
-        //printf("send TURNI.(%s)\n",jprint(cmdjson,0));
+        printf("send TURNI.(%s)\n",jprint(cmdjson,0));
         BET_message_send("BET_client_turnisend",bet->pushsock,cmdjson,1,bet);
     }
 }

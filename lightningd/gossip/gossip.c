@@ -779,12 +779,10 @@ int main(int argc, char *argv[])
 		exit(0);
 	}
 
-	secp256k1_ctx = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY |
-						 SECP256K1_CONTEXT_SIGN);
+	secp256k1_ctx = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY | SECP256K1_CONTEXT_SIGN);
 
 	daemon = tal(NULL, struct daemon);
-	/* Do not log absolutely anything, stdout is now a socket
-	 * connected to some other daemon. */
+	// Do not log absolutely anything, stdout is now a socket connected to some other daemon
 	log_book = new_log_book(daemon, 2 * 1024 * 1024, LOG_BROKEN + 1);
 	base_log =
 	    new_log(daemon, log_book, "lightningd_gossip(%u):", (int)getpid());
@@ -794,8 +792,7 @@ int main(int argc, char *argv[])
 	daemon->broadcast_interval = 30000;
 
 	/* stdin == control */
-	daemon_conn_init(daemon, &daemon->master, STDIN_FILENO, recv_req,
-			 master_gone);
+	daemon_conn_init(daemon, &daemon->master, STDIN_FILENO, recv_req,master_gone);
 	status_setup_async(&daemon->master);
 
 	/* When conn closes, everything is freed. */

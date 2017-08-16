@@ -29,7 +29,7 @@ cJSON *BET_statemachine_turni_actions(struct privatebet_info *bet,struct private
         r = 0;
     else r %= bet->range;
     jaddinum(array,r);
-    printf("BET_statemachine_turni -> r%d turni.%d\n",vars->round,vars->turni);
+    printf("BET_statemachine_turni -> r%d turni.%d r.%d / range.%d\n",vars->round,vars->turni,r,bet->range);
     return(array);
 }
 
