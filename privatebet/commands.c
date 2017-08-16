@@ -123,6 +123,7 @@ bits256 chipsln_rhash_create(uint64_t satoshis,char *label)
     if ( (inv= chipsln_invoice(satoshis * 1000,label)) != 0 )
     {
         rhash = jbits256(inv,"rhash");
+        char str[65]; printf("rhash.(%s) -> %s\n",jprint(inv,0),jbits256_str(str,rhash));
         free_json(inv);
     }
     return(rhash);
