@@ -122,16 +122,20 @@ bits256 chipsln_rhash_create(uint64_t satoshis,char *label)
     if ( label == 0 )
         label = "";
     memset(rhash.bytes,0,sizeof(rhash));
-    if ( (inv= chipsln_listinvoice(label)) != 0 )
+    if ( (array= chipsln_listinvoice(label)) != 0 )
     {
-        rhash = jbits256(inv,"rhash");
-        char str[65]; printf("list invoice.(%s) (%s) -> %s\n",label,jprint(inv,0),bits256_str(str,rhash));
-        if ( bits256_nonz(rhash) != 0 )
+        if ( cJSON_GetArraySize(array) == 1 )
         {
-            free_json(inv);
-            return(rhash);
+            inv = jitem(array,0);
+            rhash = jbits256(inv,"rhash");
+            char str[65]; printf("list invoice.(%s) (%s) -> %s\n",label,jprint(inv,0),bits256_str(str,rhash));
+            if ( bits256_nonz(rhash) != 0 )
+            {
+                free_json(array);
+                return(rhash);
+            }
         }
-        free_json(inv);
+        free_json(array);
     }
     if ( (inv= chipsln_invoice(satoshis * 1000,label)) != 0 )
     {
