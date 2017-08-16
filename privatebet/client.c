@@ -301,7 +301,7 @@ void BET_clientloop(void *_ptr)
 {
     int32_t nonz,recvlen; uint16_t port=7798; char connectaddr[64],hostip[64]; void *ptr; cJSON *msgjson,*reqjson; struct privatebet_vars *VARS; struct privatebet_info *bet = _ptr;
     VARS = calloc(1,sizeof(*VARS));
-    strcpy(hostip,"");
+    strcpy(hostip,"5.9.253.195"); // get from BET blockchain
     printf("client loop: pushsock.%d subsock.%d\n",bet->pushsock,bet->subsock);
     while ( 1 )
     {
