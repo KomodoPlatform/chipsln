@@ -116,11 +116,11 @@ cJSON *chipsln_invoice(uint64_t msatoshi,char *label)
     return(chipsln_numstr("invoice",msatoshi,label));
 }
 
-bits256 chipsln_rhash_create(int32_t satoshis,char *label)
+bits256 chipsln_rhash_create(uint64_t satoshis,char *label)
 {
     cJSON *inv; bits256 rhash;
     memset(rhash.bytes,0,sizeof(rhash));
-    if ( (inv= chipsln_invoice(chipsize * 1000,label)) != 0 )
+    if ( (inv= chipsln_invoice(satoshis * 1000,label)) != 0 )
     {
         rhash = jbits256(inv,"rhash");
         free_json(inv);
