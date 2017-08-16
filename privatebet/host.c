@@ -37,7 +37,7 @@ struct privatebet_peerln *BET_peerln_create(struct privatebet_rawpeerln *raw,int
         p = &Peersln[Num_peersln++];
         p->raw = *raw;
     }
-    if ( IAMHOST != 0 )
+    if ( IAMHOST != 0 && p != 0 )
     {
         sprintf(label,"%s_%d",LN_idstr,0);
         p->hostrhash = chipsln_rhash_create(chipsize,label);
@@ -56,35 +56,36 @@ int32_t BET_host_join(cJSON *argjson,struct privatebet_info *bet,struct privateb
         printf("JOIN.(%s)\n",jprint(argjson,0));
         if ( bits256_nonz(bet->tableid) == 0 )
             bet->tableid = Mypubkey;
-        if ( BET_pubkeyfind(bet,pubkey) < 0 )
+        if ( peerid != 0 && peerid[0] != 0 )
         {
-            if ( (n= BET_pubkeyadd(bet,pubkey)) > 0 )
+            if ((p= BET_peerln_find(peerid)) == 0 )
             {
-                if ( peerid != 0 && peerid[0] != 0 )
-                {
-                    if ((p= BET_peerln_find(peerid)) == 0 )
-                    {
-                        p = &Peersln[Num_peersln++];
-                        memset(p,0,sizeof(*p));
-                        safecopy(p->raw.peerid,peerid,sizeof(p->raw.peerid));
-                    }
-                    if ( p != 0 )
-                    {
-                        sprintf(label,"%s_%d",LN_idstr,0);
-                        p->hostrhash = chipsln_rhash_create(bet->chipsize,label);
-                        p->clientrhash = clientrhash;
-                        p->clientpubkey = pubkey;
-                    }
-                }
-                if ( n > 1 )
-                {
-                    Gamestart = (uint32_t)time(NULL);
-                    if ( n < bet->maxplayers )
-                        Gamestart += BET_GAMESTART_DELAY;
-                    printf("Gamestart in a %d seconds\n",BET_GAMESTART_DELAY);
-                } else printf("Gamestart after second player joins or we get maxplayers.%d\n",bet->maxplayers);
+                p = &Peersln[Num_peersln++];
+                memset(p,0,sizeof(*p));
+                safecopy(p->raw.peerid,peerid,sizeof(p->raw.peerid));
             }
-            return(1);
+            if ( p != 0 )
+            {
+                sprintf(label,"%s_%d",LN_idstr,0);
+                p->hostrhash = chipsln_rhash_create(bet->chipsize,label);
+                p->clientrhash = clientrhash;
+                p->clientpubkey = pubkey;
+                printf("set pubkey+rhash\n");
+            }
+            if ( BET_pubkeyfind(bet,pubkey,peerid) < 0 )
+            {
+                if ( (n= BET_pubkeyadd(bet,pubkey,peerid)) > 0 )
+                {
+                    if ( n > 1 )
+                    {
+                        Gamestart = (uint32_t)time(NULL);
+                        if ( n < bet->maxplayers )
+                            Gamestart += BET_GAMESTART_DELAY;
+                        printf("Gamestart in a %d seconds\n",BET_GAMESTART_DELAY);
+                    } else printf("Gamestart after second player joins or we get maxplayers.%d\n",bet->maxplayers);
+                }
+                return(1);
+            }
         }
     }
     return(0);

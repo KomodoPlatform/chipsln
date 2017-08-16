@@ -14,17 +14,21 @@
  ******************************************************************************/
 
 
-int32_t BET_pubkeyfind(struct privatebet_info *bet,bits256 pubkey)
+int32_t BET_pubkeyfind(struct privatebet_info *bet,bits256 pubkey,char *peerid)
 {
     int32_t i;
     //char str[65]; printf("PUBKEY FIND.(%s)\n",bits256_str(str,pubkey));
     for (i=0; i<sizeof(bet->playerpubs)/sizeof(*bet->playerpubs); i++)
         if ( bits256_cmp(pubkey,bet->playerpubs[i]) == 0 )
-            return(i);
+        {
+            if ( strcmp(peerid,bet->peerids[i]) == 0 )
+                return(i);
+            else return(-1);
+        }
     return(-1);
 }
 
-int32_t BET_pubkeyadd(struct privatebet_info *bet,bits256 pubkey)
+int32_t BET_pubkeyadd(struct privatebet_info *bet,bits256 pubkey,char *peerid)
 {
     int32_t i,n = 0;
     //char str[65]; printf("PUBKEY ADD.(%s) maxplayers.%d\n",bits256_str(str,pubkey),bet->maxplayers);
@@ -35,6 +39,7 @@ int32_t BET_pubkeyadd(struct privatebet_info *bet,bits256 pubkey)
         if ( bits256_nonz(bet->playerpubs[i]) == 0 )
         {
             bet->playerpubs[i] = pubkey;
+            safecopy(bet->peerids[i],peerid,sizeof(bet->peerids[i]));
             for (i=0; i<sizeof(bet->playerpubs)/sizeof(*bet->playerpubs); i++)
                 if ( bits256_nonz(bet->playerpubs[i]) != 0 )
                 {
