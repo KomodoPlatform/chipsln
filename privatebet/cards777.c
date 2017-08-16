@@ -513,9 +513,9 @@ char *BET_createdeck(cJSON *argjson)
         deckid = cards777_initdeck(cards,cardpubs,range,numplayers,playerpubs,Debug_privkeys);
         memset(sharenrs,0,sizeof(sharenrs));
         gfshare_calc_sharenrs(sharenrs,numplayers,deckid.bytes,sizeof(deckid));
-        //for (i=0; i<numplayers; i++)
-        //    printf("%d ",sharenrs[i]);
-        //char str[65]; printf("calc_sharenrs deckid.%s\n",bits256_str(str,deckid));
+        for (i=0; i<numplayers; i++)
+            printf("%d ",sharenrs[i]);
+        char str[65]; printf("calc_sharenrs deckid.%s\n",bits256_str(str,deckid));
         cardshares = calloc(numplayers,sizeof(bits256));
         allshares = calloc(numplayers,sizeof(bits256)*numplayers*range);
         M = numplayers/2 + 1;
