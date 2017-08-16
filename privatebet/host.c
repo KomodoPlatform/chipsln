@@ -215,12 +215,12 @@ int32_t BET_chipsln_update(struct privatebet_info *bet,struct privatebet_vars *v
     Num_rawpeersln = 0;
     if ( (rawpeers= chipsln_getpeers()) != 0 )
     {
-        if ( (array= jarray(&n,peers,"peers")) != 0 )
+        if ( (array= jarray(&n,rawpeers,"peers")) != 0 )
         {
             for (i=0; i<n&&Num_rawpeersln<CARDS777_MAXPLAYERS; i++)
             {
                 item = jitem(array,i);
-                if ( BET_player_parseln(&Rawpeersln[Num_Rawpeersln],item) == 0 )
+                if ( BET_rawpeerln_parse(&Rawpeersln[Num_Rawpeersln],item) == 0 )
                     Num_Rawpeersln++;
             }
             if ( memcmp(Rawpeersln,oldRawpeersln,sizeof(Rawpeersln)) != 0 )
