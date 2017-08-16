@@ -17,12 +17,42 @@ struct privatebet_rawpeerln Rawpeersln[CARDS777_MAXPLAYERS],oldRawpeersln[CARDS7
 struct privatebet_peerln Peersln[CARDS777_MAXPLAYERS];
 int32_t Num_rawpeersln,oldNum_rawpeersln,Num_peersln;
 
+struct privatebet_peerln *BET_peerln_find(char *peerid)
+{
+    int32_t i;
+    if ( peerid != 0 && peerid[0] != 0 )
+    {
+        for (i=0; i<Num_peersln; i++)
+            if ( strcmp(Peersln[i].raw.peerid,peerid) == 0 )
+                return(&Peersln[i]);
+    }
+    return(0);
+}
+
+struct privatebet_peerln *BET_peerln_create(struct privatebet_rawpeerln *raw,int32_t maxplayers,int32_t maxchips,int32_t chipsize)
+{
+    struct privatebet_peerln *p; cJSON *inv; char label[64];
+    if ( (p= BET_peerln_find(raw.peerid)) == 0 )
+    {
+        p = &Peersln[Num_peersln++];
+        p->raw = *raw;
+    }
+    if ( IAMHOST != 0 )
+    {
+        sprintf(label,"%s_%d",LN_idstr,0);
+        p->hostrhash = chipsln_rhash_create(chipsize,label);
+    }
+    return(p);
+}
+
 int32_t BET_host_join(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars)
 {
-    bits256 pubkey; int32_t n;
+    bits256 pubkey; int32_t n; char *peerid,label[64]; bits256 clientrhash; struct privatebet_peerln *p;
     pubkey = jbits256(argjson,"pubkey");
     if ( bits256_nonz(pubkey) != 0 )
     {
+        peerid = jstr(argjson,"peerid");
+        clientrhash = jbits256(argjson,"clientrhash");
         printf("JOIN.(%s)\n",jprint(argjson,0));
         if ( bits256_nonz(bet->tableid) == 0 )
             bet->tableid = Mypubkey;
@@ -30,6 +60,22 @@ int32_t BET_host_join(cJSON *argjson,struct privatebet_info *bet,struct privateb
         {
             if ( (n= BET_pubkeyadd(bet,pubkey)) > 0 )
             {
+                if ( peerid != 0 && peerid[0] != 0 )
+                {
+                    if ((p= BET_peerln_find(peerid)) == 0 )
+                    {
+                        p = &Peersln[Num_peersln++];
+                        memset(p,0,sizeof(*p));
+                        safecopy(p->peerid,peerid,sizeof(p->peerid));
+                        sprintf(label,"%s_%d",LN_idstr,0);
+                        p->hostrhash = chipsln_rhash_create(bet->chipsize,label);
+                    }
+                    if ( p != 0 )
+                    {
+                        p->clientrhash = clientrhash;
+                        p->clientpubkey = pubkey;
+                    }
+                }
                 if ( n > 1 )
                 {
                     Gamestart = (uint32_t)time(NULL);
@@ -38,7 +84,7 @@ int32_t BET_host_join(cJSON *argjson,struct privatebet_info *bet,struct privateb
                     printf("Gamestart in a %d seconds\n",BET_GAMESTART_DELAY);
                 } else printf("Gamestart after second player joins or we get maxplayers.%d\n",bet->maxplayers);
             }
-            return(0);
+            return(1);
         }
     }
     return(0);
@@ -166,31 +212,6 @@ int32_t BET_rawpeerln_parse(struct privatebet_rawpeerln *raw,cJSON *item)
     return(0);
 }
 
-struct privatebet_peerln *BET_peerln_find(char *peerid)
-{
-    int32_t i;
-    if ( peerid != 0 && peerid[0] != 0 )
-    {
-        for (i=0; i<Num_peersln; i++)
-            if ( strcmp(Peersln[i].raw.peerid,peerid) == 0 )
-                return(&Peersln[i]);
-    }
-    return(0);
-}
-
-struct privatebet_peerln *BET_peerln_create(struct privatebet_rawpeerln *raw,int32_t maxplayers,int32_t maxchips,int32_t chipsize)
-{
-    struct privatebet_peerln *p; cJSON *inv; char label[64];
-    p = &Peersln[Num_peersln++];
-    p->raw = *raw;
-    if ( IAMHOST != 0 )
-    {
-        sprintf(label,"%s_%d",LN_idstr,0);
-        p->hostrhash = chipsln_rhash_create(chipsize,label);
-    }
-    return(p);
-}
-
 cJSON *BET_hostrhashes(struct privatebet_info *bet)
 {
     int32_t i; bits256 rhash; struct privatebet_peerln *p; cJSON *array = cJSON_CreateArray();
@@ -261,7 +282,6 @@ void BET_hostloop(void *_ptr)
     printf("hostloop pubsock.%d pullsock.%d range.%d\n",bet->pubsock,bet->pullsock,bet->range);
     while ( bet->pullsock >= 0 && bet->pubsock >= 0 )
     {
-        printf("hostiter\n");
         nonz = 0;
         if ( (recvlen= nn_recv(bet->pullsock,&ptr,NN_MSG,0)) > 0 )
         {

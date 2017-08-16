@@ -281,7 +281,7 @@ struct privatebet_rawpeerln
 struct privatebet_peerln
 {
     int32_t numrhashes,numpaid;
-    bits256 hostrhash,clientrhash;
+    bits256 hostrhash,clientrhash,clientpubkey;
     struct privatebet_rawpeerln raw;
 };
 
