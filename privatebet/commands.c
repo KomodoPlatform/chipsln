@@ -128,7 +128,7 @@ bits256 chipsln_rhash_create(uint64_t satoshis,char *label)
         {
             inv = jitem(array,0);
             rhash = jbits256(inv,"rhash");
-            char str[65]; printf("list invoice.(%s) (%s) -> %s\n",label,jprint(inv,0),bits256_str(str,rhash));
+            //char str[65]; printf("list invoice.(%s) (%s) -> %s\n",label,jprint(inv,0),bits256_str(str,rhash));
             if ( bits256_nonz(rhash) != 0 )
             {
                 free_json(array);

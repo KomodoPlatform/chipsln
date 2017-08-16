@@ -290,8 +290,9 @@ void BET_hostloop(void *_ptr)
             {
                 if ( BET_hostcommand(argjson,bet,VARS) != 0 ) // usually just relay to players
                 {
-                    if ( (sendlen= nn_send(bet->pubsock,ptr,recvlen,0)) != recvlen )
-                        printf("sendlen.%d != recvlen.%d for %s\n",sendlen,recvlen,jprint(argjson,0));
+                    BET_message_send("BET_relay",bet->pubsock,argjson,0,bet);
+                    //if ( (sendlen= nn_send(bet->pubsock,ptr,recvlen,0)) != recvlen )
+                    //    printf("sendlen.%d != recvlen.%d for %s\n",sendlen,recvlen,jprint(argjson,0));
                 }
                 free_json(argjson);
             }
