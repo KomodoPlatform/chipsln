@@ -333,6 +333,7 @@ void BET_clientloop(void *_ptr)
             jaddbits256(reqjson,"pubkey",Mypubkey);
             jaddstr(reqjson,"method","join");
             jaddstr(reqjson,"peerid",LN_idstr);
+            Clientrhash = chipsln_rhash_create(bet->chipsize,"0");
             BET_message_send("BET_havetable",bet->pushsock,reqjson,1,bet);
         }
         else

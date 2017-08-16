@@ -23,7 +23,7 @@ int32_t BET_host_join(cJSON *argjson,struct privatebet_info *bet,struct privateb
     pubkey = jbits256(argjson,"pubkey");
     if ( bits256_nonz(pubkey) != 0 )
     {
-        //printf("JOIN.(%s)\n",jprint(argjson,0));
+        printf("JOIN.(%s)\n",jprint(argjson,0));
         if ( bits256_nonz(bet->tableid) == 0 )
             bet->tableid = Mypubkey;
         if ( BET_pubkeyfind(bet,pubkey) < 0 )
@@ -37,8 +37,8 @@ int32_t BET_host_join(cJSON *argjson,struct privatebet_info *bet,struct privateb
                         Gamestart += BET_GAMESTART_DELAY;
                     printf("Gamestart in a %d seconds\n",BET_GAMESTART_DELAY);
                 } else printf("Gamestart after second player joins or we get maxplayers.%d\n",bet->maxplayers);
-                return(1);
-            } else return(0);
+            }
+            return(0);
         }
     }
     return(0);
@@ -183,12 +183,9 @@ struct privatebet_peerln *BET_peerln_create(struct privatebet_rawpeerln *raw,int
     struct privatebet_peerln *p; cJSON *inv;
     p = &Peersln[Num_peersln++];
     p->raw = *raw;
-    if ( (inv= chipsln_invoice(chipsize * 1000,"0")) != 0 )
+    if ( IAMHOST != 0 )
     {
-        if ( IAMHOST != 0 )
-            p->hostrhash = jbits256(inv,"rhash");
-        else p->clientrhash = jbits256(inv,"rhash");
-        free_json(inv);
+        p->hostrhash = chipsln_rhash_create(chipsize,"0");
     }
     return(p);
 }
