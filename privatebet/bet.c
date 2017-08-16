@@ -128,14 +128,23 @@ int main(int argc,const char *argv[])
             *BET2 = *BET;
             if ( passphrase == 0 || passphrase[0] == 0 )
             {
-                passphrase = OS_filestr(&fsize,"passphrase");
-                if ( passphrase == 0 || passphrase[0] == 0 )
+                FILE *fp;
+                //passphrase = OS_filestr(&fsize,"passphrase");
+                if ( (fp= fopen("passphrase","rb")) == 0 )
+                //if ( passphrase == 0 || passphrase[0] == 0 )
                 {
                     OS_randombytes((void *)&randvals,sizeof(randvals));
                     sprintf(randphrase,"%llu",(long long)randvals);
                     printf("randphrase.(%s)\n",randphrase);
                     passphrase = randphrase;
-                } else printf("found passphrase file\n");
+                }
+                else
+                {
+                    printf("found passphrase file\n");
+                    fread(randphrase,1,sizeof(randphrase),fp);
+                    passphrase = randphrase;
+                    fclose(fp);
+                }
             }
             printf("passphrase.(%s) pushsock.%d subsock.%d\n",passphrase,pushsock,subsock);
             conv_NXTpassword(privkey.bytes,pubkey.bytes,(uint8_t *)passphrase,(int32_t)strlen(passphrase));
