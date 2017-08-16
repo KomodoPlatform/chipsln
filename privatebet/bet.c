@@ -136,6 +136,11 @@ int main(int argc,const char *argv[])
                     OS_randombytes((void *)&randvals,sizeof(randvals));
                     sprintf(randphrase,"%llu",(long long)randvals);
                     printf("randphrase.(%s)\n",randphrase);
+                    if ( (fp= fopen("passphrase","wb")) != 0 )
+                    {
+                        fwrite(randphrase,1,strlen(randphrase),fp);
+                        fclose(fp);
+                    }
                     passphrase = randphrase;
                 }
                 else
