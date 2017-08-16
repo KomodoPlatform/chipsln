@@ -310,7 +310,7 @@ void BET_hostloop(void *_ptr)
         }
         if ( Gamestarted == 0 )
         {
-            printf(">>>>>>>>> t%u gamestart.%u numplayers.%d turni.%d round.%d\n",(uint32_t)time(NULL),Gamestart,bet->numplayers,VARS.turni,VARS.round);
+            printf(">>>>>>>>> t%u gamestart.%u numplayers.%d turni.%d round.%d\n",(uint32_t)time(NULL),Gamestart,bet->numplayers,VARS->turni,VARS->round);
             if ( time(NULL) > Gamestart && bet->numplayers > 1 && VARS->turni == 0 && VARS->round == 0 )
             {
                 Gamestarted = (uint32_t)time(NULL);
