@@ -226,7 +226,7 @@ int32_t BET_chipsln_update(struct privatebet_info *bet,struct privatebet_vars *v
             if ( memcmp(Rawpeersln,oldRawpeersln,sizeof(Rawpeersln)) != 0 )
             {
                 retval++;
-                for (i=0; i<Num_Rawpeersln; i++)
+                for (i=0; i<Num_rawpeersln; i++)
                 {
                     if ( BET_peerln_find(Rawpeersln[i].peerid) == 0 )
                     {
