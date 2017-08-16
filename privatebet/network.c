@@ -30,7 +30,6 @@ void BET_message_send(char *debugstr,int32_t sock,cJSON *msgjson,int32_t freefla
     if ( IAMHOST != 0 )
     {
         jadd(msgjson,"hostrhash",BET_hostrhashes(bet));
-        jaddstr(msgjson,"LN_ipaddr",LN_ipaddr);
         jaddnum(msgjson,"LN_port",LN_port);
     } else jaddbits256(msgjson,"clientrhash",BET_clientrhash());
     msg = jprint(msgjson,freeflag);

@@ -15,7 +15,7 @@
 
 
 #include "bet.h"
-char *LN_idstr,LN_ipaddr[64],BET_ORACLEURL[64] = "127.0.0.1:7797";
+char *LN_idstr,BET_ORACLEURL[64] = "127.0.0.1:7797";
 uint16_t LN_port;
 int32_t Gamestart,Gamestarted,Lastturni,Maxrounds = 3,Maxplayers = 2;
 uint8_t BET_logs[256],BET_exps[510];
@@ -65,12 +65,12 @@ int main(int argc,const char *argv[])
     portable_mutex_init(&LP_psockmutex);
     portable_mutex_init(&LP_messagemutex);
     portable_mutex_init(&BET_shardmutex);
+    sleep(1);
     if ( (infojson= chipsln_getinfo()) != 0 )
     {
         if ( (LN_idstr= clonestr(jstr(infojson,"id"))) == 0 || strlen(LN_idstr) != 66 )
             printf("need 33 byte secp pubkey\n"), exit(-1);
         LN_port = juint(infojson,"port");
-        safecopy(LN_ipaddr,jstr(argjson,"ipaddr"),sizeof(LN_ipaddr));
         printf("getinfo.(%s)\n",jprint(infojson,1));
     } else printf("need to have CHIPS and lightning running\n"), exit(-1);
     printf("help.(%s)\n",jprint(chipsln_help(),1));
