@@ -235,7 +235,7 @@ int32_t BET_chipsln_update(struct privatebet_info *bet,struct privatebet_vars *v
                 }
             }
         }
-        if ( 0 && (channels= chipsln_getchannels()) != 0 )
+        if ( 1 && (channels= chipsln_getchannels()) != 0 )
         {
             if ( (invoices= chipsln_listinvoice("")) != 0 )
             {
