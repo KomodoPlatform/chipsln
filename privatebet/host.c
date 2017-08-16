@@ -70,7 +70,6 @@ int32_t BET_host_join(cJSON *argjson,struct privatebet_info *bet,struct privateb
                 p->hostrhash = chipsln_rhash_create(bet->chipsize,label);
                 p->clientrhash = clientrhash;
                 p->clientpubkey = pubkey;
-                printf("set pubkey+rhash\n");
             }
             if ( BET_pubkeyfind(bet,pubkey,peerid) < 0 )
             {

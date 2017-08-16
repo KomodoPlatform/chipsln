@@ -135,7 +135,7 @@ int main(int argc,const char *argv[])
                     sprintf(randphrase,"%llu",(long long)randvals);
                     printf("randphrase.(%s)\n",randphrase);
                     passphrase = randphrase;
-                }
+                } else printf("found passphrase file\n");
             }
             printf("passphrase.(%s) pushsock.%d subsock.%d\n",passphrase,pushsock,subsock);
             conv_NXTpassword(privkey.bytes,pubkey.bytes,(uint8_t *)passphrase,(int32_t)strlen(passphrase));
