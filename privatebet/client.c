@@ -20,7 +20,7 @@ bits256 BET_clientrhash()
     return(Clienthash);
 }
 
-int32_t BET_client_deali(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars,int32_t senderid)
+int32_t BET_client_join(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars,int32_t senderid)
 {
     printf("JOIN broadcast.(%s)\n",jprint(argjson,0));
     return(0);
