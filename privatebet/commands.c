@@ -180,7 +180,6 @@ char *privatebet_command(void *ctx,cJSON *argjson,char *remoteaddr,uint16_t port
         if ( IAMORACLE != 0 || (IAMHOST != 0 && strcmp(BET_ORACLEURL,"127.0.0.1:7797") == 0) )
             return(BET_oracle_command(ctx,method,argjson));
         else return(clonestr("{\"error\":\"not an ORACLE\"}"));
-        else return(clonestr("{\"error\":\"missing method\"}"));
     } else return(clonestr("{\"error\":\"missing method\"}"));
 }
 
