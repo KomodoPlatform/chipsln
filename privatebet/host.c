@@ -221,7 +221,7 @@ int32_t BET_chipsln_update(struct privatebet_info *bet,struct privatebet_vars *v
             {
                 item = jitem(array,i);
                 if ( BET_rawpeerln_parse(&Rawpeersln[Num_rawpeersln],item) == 0 )
-                    Num_Rawpeersln++;
+                    Num_rawpeersln++;
             }
             if ( memcmp(Rawpeersln,oldRawpeersln,sizeof(Rawpeersln)) != 0 )
             {
