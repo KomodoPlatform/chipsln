@@ -299,7 +299,7 @@ int32_t BET_clientupdate(cJSON *argjson,uint8_t *ptr,int32_t recvlen,struct priv
 
 void BET_clientloop(void *_ptr)
 {
-    int32_t nonz,recvlen; uint16_t port=7798; char connectaddr[64],hostip[64]; void *ptr; cJSON *msgjson; struct privatebet_vars *VARS; struct privatebet_info *bet = _ptr;
+    int32_t nonz,recvlen; uint16_t port=7798; char connectaddr[64],hostip[64]; void *ptr; cJSON *msgjson,*reqjson; struct privatebet_vars *VARS; struct privatebet_info *bet = _ptr;
     VARS = calloc(1,sizeof(*VARS));
     strcpy(hostip,"");
     printf("client loop: pushsock.%d subsock.%d\n",bet->pushsock,bet->subsock);
@@ -330,7 +330,7 @@ void BET_clientloop(void *_ptr)
             BET_transportname(0,connectaddr,hostip,port+1);
             bet->pushsock = BET_nanosock(0,connectaddr,NN_PUSH);
             reqjson = cJSON_CreateObject();
-            jaddbits256(reqjson,"pubkey",pubkey);
+            jaddbits256(reqjson,"pubkey",Mypubkey);
             jaddstr(reqjson,"method","join");
             jaddstr(reqjson,"peerid",LN_idstr);
             BET_message_send("BET_havetable",bet->pushsock,reqjson,1,bet);

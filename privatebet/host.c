@@ -15,7 +15,7 @@
 
 struct privatebet_rawpeerln Rawpeersln[CARDS777_MAXPLAYERS],oldRawpeersln[CARDS777_MAXPLAYERS];
 struct privatebet_peerln Peersln[CARDS777_MAXPLAYERS];
-int32_t Num_Rawpeersln,oldNum_Rawpeersln,Num_peersln;
+int32_t Num_rawpeersln,oldNum_rawpeersln,Num_peersln;
 
 int32_t BET_host_join(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars)
 {
@@ -134,10 +134,8 @@ Hostloop:
 
 void BETS_players_update(struct privatebet_info *bet,struct privatebet_vars *vars)
 {
-    int32_t i; struct privatebet_player *p;
-    for (i=0; i<bet->numplayers; i++)
+    int32_t i;     for (i=0; i<bet->numplayers; i++)
     {
-        p = &vars->players[i];
         /*update state: new, initial tip, active lasttime, missing, dead
         if ( dead for more than 5 minutes )
             close channel (settles chips)*/
@@ -174,7 +172,7 @@ struct privatebet_peerln *BET_peerln_find(char *peerid)
     if ( peerid != 0 && peerid[0] != 0 )
     {
         for (i=0; i<Num_peersln; i++)
-            if ( strcmp(Peersln[i].peerid,peerid) == 0 )
+            if ( strcmp(Peersln[i].raw.peerid,peerid) == 0 )
                 return(&Peersln[i]);
     }
     return(0);
@@ -198,9 +196,9 @@ struct privatebet_peerln *BET_peerln_create(struct privatebet_rawpeerln *raw,int
 cJSON *BET_hostrhashes(struct privatebet_info *bet)
 {
     int32_t i; bits256 rhash; struct privatebet_peerln *p; cJSON *array = cJSON_CreateArray();
-    for (i=0; i<numplayers; i++)
+    for (i=0; i<bet->numplayers; i++)
     {
-        if ( (p= BET_peerln_find(bet->peerids[i][0])) != 0 )
+        if ( (p= BET_peerln_find(bet->peerids[i])) != 0 )
             rhash = p->hostrhash;
         else memset(rhash.bytes,0,sizeof(rhash));
         jaddibits256(array,rhash);
@@ -214,7 +212,7 @@ int32_t BET_chipsln_update(struct privatebet_info *bet,struct privatebet_vars *v
     oldNum_rawpeersln = Num_rawpeersln;
     memcpy(oldRawpeersln,Rawpeersln,sizeof(Rawpeersln));
     memset(Rawpeersln,0,sizeof(Rawpeersln));
-    Num_Rawpeersln = 0;
+    Num_rawpeersln = 0;
     if ( (rawpeers= chipsln_getpeers()) != 0 )
     {
         if ( (array= jarray(&n,peers,"peers")) != 0 )
