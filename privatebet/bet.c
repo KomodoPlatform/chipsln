@@ -129,9 +129,7 @@ int main(int argc,const char *argv[])
             if ( passphrase == 0 || passphrase[0] == 0 )
             {
                 FILE *fp;
-                //passphrase = OS_filestr(&fsize,"passphrase");
                 if ( (fp= fopen("passphrase","rb")) == 0 )
-                //if ( passphrase == 0 || passphrase[0] == 0 )
                 {
                     OS_randombytes((void *)&randvals,sizeof(randvals));
                     sprintf(randphrase,"%llu",(long long)randvals);
