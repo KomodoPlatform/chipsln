@@ -14,15 +14,25 @@
  ******************************************************************************/
 
 
-void BET_message_send(char *debugstr,int32_t sock,cJSON *msgjson,int32_t freeflag)
+void BET_message_send(char *debugstr,int32_t sock,cJSON *msgjson,int32_t freeflag,struct privatebet_info *bet)
 {
     int32_t sendlen,len; char *msg;
     if ( jobj(msgjson,"sender") != 0 )
         jdelete(msgjson,"sender");
     jaddbits256(msgjson,"sender",Mypubkey);
-    if ( jobj(msgjson,"node_id") != 0 )
-        jdelete(msgjson,"node_id");
-    jaddstr(msgjson,"node_id",LN_idstr);
+    if ( jobj(msgjson,"peerid") != 0 )
+        jdelete(msgjson,"peerid");
+    jaddstr(msgjson,"peerid",LN_idstr);
+    if ( jobj(msgjson,"hostrhash") != 0 )
+        jdelete(msgjson,"hostrhash");
+    if ( jobj(msgjson,"clientrhash") != 0 )
+        jdelete(msgjson,"clientrhash");
+    if ( IAMHOST != 0 )
+    {
+        jaddbits256(msgjson,"hostrhash",BET_hostrhashes(bet));
+        jaddstr(argjson,"LN_ipaddr",LN_ipaddr);
+        jaddnum(argjson,"LN_port",LN_port);
+    } else jaddbits256(msgjson,"clientrhash",BET_clientrhash());
     msg = jprint(msgjson,freeflag);
     len = (int32_t)strlen(msg) + 1;
     if ( (sendlen= nn_send(sock,msg,len,0)) != len )
@@ -296,7 +306,7 @@ void BET_mofn_send(struct privatebet_info *bet,struct privatebet_vars *vars,int3
             //char str[65]; printf("%s -> cipherstr.(%s)\n",bits256_str(str,shard),cipherstr);
         }
         //char str[65]; fprintf(stderr,"{j%d c%d %s} ",j,cardi,bits256_str(str,shard));
-        BET_message_send("BET_mofn_send",bet->pubsock>=0?bet->pubsock:bet->pushsock,reqjson,1);
+        BET_message_send("BET_mofn_send",bet->pubsock>=0?bet->pubsock:bet->pushsock,reqjson,1,bet);
     }
     else
     {

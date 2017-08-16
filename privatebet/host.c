@@ -13,6 +13,9 @@
  *                                                                            *
  ******************************************************************************/
 
+struct privatebet_rawpeerln Rawpeersln[CARDS777_MAXPLAYERS],oldRawpeersln[CARDS777_MAXPLAYERS];
+struct privatebet_peerln Peersln[CARDS777_MAXPLAYERS];
+int32_t Num_Rawpeersln,oldNum_Rawpeersln,Num_peersln;
 
 int32_t BET_host_join(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars)
 {
@@ -63,7 +66,7 @@ void BET_host_gamestart(struct privatebet_info *bet,struct privatebet_vars *vars
     jaddnum(reqjson,"numplayers",bet->numplayers);
     jaddnum(reqjson,"numrounds",bet->numrounds);
     jaddnum(reqjson,"range",bet->range);
-    BET_message_send("BET_start",bet->pubsock,reqjson,1);
+    BET_message_send("BET_start",bet->pubsock,reqjson,1,bet);
     deckjson = 0;
     if ( (reqjson= BET_createdeck_request(bet->playerpubs,bet->numplayers,bet->range)) != 0 )
     {
@@ -90,7 +93,7 @@ void BET_host_gamestart(struct privatebet_info *bet,struct privatebet_vars *vars
     jaddnum(reqjson,"numplayers",bet->numplayers);
     jaddnum(reqjson,"numrounds",bet->numrounds);
     jaddnum(reqjson,"range",bet->range);
-    BET_message_send("BET_start",bet->pubsock,reqjson,1);
+    BET_message_send("BET_start",bet->pubsock,reqjson,1,bet);
 }
 
 /*
@@ -146,33 +149,104 @@ void BETS_players_update(struct privatebet_info *bet,struct privatebet_vars *var
             jaddnum(timeoutjson,"turni",VARS->turni);
             jaddbits256(timeoutjson,"pubkey",bet->playerpubs[VARS->turni]);
             jadd(timeoutjson,"actions",cJSON_Parse("[\"timeout\"]"));
-            BET_message_send("TIMEOUT",bet->pubsock,timeoutjson,1);
+            BET_message_send("TIMEOUT",bet->pubsock,timeoutjson,1,bet);
             //BET_host_turni_next(bet,&VARS);
         }*/
     }
 }
 
+int32_t BET_rawpeerln_parse(struct privatebet_rawpeerln *raw,cJSON *item)
+{
+    raw->unique_id = juint(item,"unique_id");
+    safecopy(raw->netaddr,jstr(item,"netaddr"),sizeof(raw->netaddr));
+    safecopy(raw->peerid,jstr(item,"peerid"),sizeof(raw->peerid));
+    safecopy(raw->channel,jstr(item,"channel"),sizeof(raw->channel));
+    safecopy(raw->state,jstr(item,"state"),sizeof(raw->state));
+    raw->msatoshi_to_us = jdouble(item,"msatoshi_to_us");
+    raw->msatoshi_total = jdouble(item,"msatoshi_total");
+    //{ "peers" : [ { "unique_id" : 0, "state" : "CHANNELD_NORMAL", "netaddr" : "5.9.253.195:9735", "peerid" : "02779b57b66706778aa1c7308a817dc080295f3c2a6af349bb1114b8be328c28dc", "channel" : "2646:1:0", "msatoshi_to_us" : 9999000, "msatoshi_total" : 10000000 } ] }
+    return(0);
+}
+
+struct privatebet_peerln *BET_peerln_find(char *peerid)
+{
+    int32_t i;
+    if ( peerid != 0 && peerid[0] != 0 )
+    {
+        for (i=0; i<Num_peersln; i++)
+            if ( strcmp(Peersln[i].peerid,peerid) == 0 )
+                return(&Peersln[i]);
+    }
+    return(0);
+}
+
+struct privatebet_peerln *BET_peerln_create(struct privatebet_rawpeerln *raw,int32_t maxplayers,int32_t maxchips,int32_t chipsize)
+{
+    struct privatebet_peerln *p; cJSON *inv;
+    p = &Peersln[Num_peersln++];
+    p->raw = *raw;
+    if ( (inv= chipsln_invoice(chipsize * 1000,"0")) != 0 )
+    {
+        if ( IAMHOST != 0 )
+            p->hostrhash = jbits256(inv,"rhash");
+        else p->clientrhash = jbits256(inv,"rhash");
+        free_json(inv);
+    }
+    return(p);
+}
+
+cJSON *BET_hostrhashes(struct privatebet_info *bet)
+{
+    int32_t i; bits256 rhash; struct privatebet_peerln *p; cJSON *array = cJSON_CreateArray();
+    for (i=0; i<numplayers; i++)
+    {
+        if ( (p= BET_peerln_find(bet->peerids[i][0])) != 0 )
+            rhash = p->hostrhash;
+        else memset(rhash.bytes,0,sizeof(rhash));
+        jaddibits256(array,rhash);
+    }
+    return(array);
+}
+
 int32_t BET_chipsln_update(struct privatebet_info *bet,struct privatebet_vars *vars)
 {
-    cJSON *peers,*channels,*invoices; int32_t isnew = 0,waspaid = 0;
-    if ( (peers= chipsln_getpeers()) != 0 )
+    struct privatebet_rawpeerln raw; cJSON *rawpeers,*channels,*invoices,*array,*item; int32_t i,n,isnew = 0,waspaid = 0,retval = 0;
+    oldNum_rawpeersln = Num_rawpeersln;
+    memcpy(oldRawpeersln,Rawpeersln,sizeof(Rawpeersln));
+    memset(Rawpeersln,0,sizeof(Rawpeersln));
+    Num_Rawpeersln = 0;
+    if ( (rawpeers= chipsln_getpeers()) != 0 )
     {
-        //{ "peers" : [ { "unique_id" : 0, "state" : "CHANNELD_NORMAL", "netaddr" : "5.9.253.195:9735", "peerid" : "02779b57b66706778aa1c7308a817dc080295f3c2a6af349bb1114b8be328c28dc", "channel" : "2646:1:0", "msatoshi_to_us" : 9999000, "msatoshi_total" : 10000000 } ] }
+        if ( (array= jarray(&n,peers,"peers")) != 0 )
+        {
+            for (i=0; i<n&&Num_rawpeersln<CARDS777_MAXPLAYERS; i++)
+            {
+                item = jitem(array,i);
+                if ( BET_player_parseln(&Rawpeersln[Num_Rawpeersln],item) == 0 )
+                    Num_Rawpeersln++;
+            }
+            if ( memcmp(Rawpeersln,oldRawpeersln,sizeof(Rawpeersln)) != 0 )
+            {
+                retval++;
+                for (i=0; i<Num_Rawpeersln; i++)
+                {
+                    if ( BET_peerln_find(Rawpeersln[i].peerid) == 0 )
+                    {
+                        BET_peerln_create(&Rawpeersln[i],bet->maxplayers,bet->maxchips,bet->chipsize);
+                    }
+                }
+            }
+        }
         if ( (channels= chipsln_getchannels()) != 0 )
         {
             if ( (invoices= chipsln_listinvoice("")) != 0 )
             {
                 // update player info
-                if ( isnew != 0 )
-                {
-                    // send rhashes
-                    // request rhashes
-                }
                 if ( waspaid != 0 )
                 {
                     // find player
-                    // p->hostfee <- first
-                    // p->tablebet <- sendpays
+                    // raw->hostfee <- first
+                    // raw->tablebet <- sendpays
                     // broadcast bet amount
                 }
                 free_json(invoices);
@@ -181,7 +255,7 @@ int32_t BET_chipsln_update(struct privatebet_info *bet,struct privatebet_vars *v
         }
         free_json(peers);
     }
-    return(0);
+    return(retval);
 }
 
 void BET_hostloop(void *_ptr)
@@ -210,7 +284,7 @@ void BET_hostloop(void *_ptr)
         {
             if ( BET_chipsln_update(bet,VARS) == 0 )
             {
-                BETS_players_update(bet,VARS);
+                //BETS_players_update(bet,VARS);
                 usleep(100000);
             }
         }

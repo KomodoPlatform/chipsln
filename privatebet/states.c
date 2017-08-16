@@ -47,7 +47,7 @@ void BET_statemachine_deali(struct privatebet_info *bet,struct privatebet_vars *
     jaddnum(reqjson,"playerj",playerj);
     jaddnum(reqjson,"deali",deali);
     jaddnum(reqjson,"cardi",vars->permi[deali]);
-    BET_message_send("BET_deali",bet->pubsock>=0?bet->pubsock:bet->pushsock,reqjson,1);
+    BET_message_send("BET_deali",bet->pubsock>=0?bet->pubsock:bet->pushsock,reqjson,1,bet);
 }
 
 void BET_statemachine_roundstart(struct privatebet_info *bet,struct privatebet_vars *vars)

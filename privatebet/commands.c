@@ -200,8 +200,8 @@ int32_t BET_havetable(bits256 pubkey,uint8_t *pubkey33,struct privatebet_info *b
         reqjson = cJSON_CreateObject();
         jaddbits256(reqjson,"pubkey",pubkey);
         jaddstr(reqjson,"method","join");
-        jaddstr(reqjson,"node_id",LN_idstr);
-        BET_message_send("BET_havetable",bet->pushsock,reqjson,1);
+        jaddstr(reqjson,"peerid",LN_idstr);
+        BET_message_send("BET_havetable",bet->pushsock,reqjson,1,bet);
         return(-1);
     }
 }

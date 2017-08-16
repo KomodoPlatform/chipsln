@@ -13,6 +13,18 @@
  *                                                                            *
  ******************************************************************************/
 
+bits256 Clienthash;
+
+bits256 BET_clientrhash()
+{
+    return(Clienthash);
+}
+
+int32_t BET_client_deali(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars,int32_t senderid)
+{
+    printf("JOIN broadcast.(%s)\n",jprint(argjson,0));
+    return(0);
+}
 
 void BET_client_turnisend(struct privatebet_info *bet,struct privatebet_vars *vars)
 {
@@ -27,7 +39,7 @@ void BET_client_turnisend(struct privatebet_info *bet,struct privatebet_vars *va
         jaddbits256(cmdjson,"pubkey",Mypubkey);
         jadd(cmdjson,"actions",BET_statemachine_turni_actions(bet,vars));
         //printf("send TURNI.(%s)\n",jprint(cmdjson,0));
-        BET_message_send("BET_client_turnisend",bet->pushsock,cmdjson,1);
+        BET_message_send("BET_client_turnisend",bet->pushsock,cmdjson,1,bet);
     }
 }
 
@@ -47,7 +59,7 @@ void BET_client_turninext(struct privatebet_info *bet,struct privatebet_vars *va
         reqjson = cJSON_CreateObject();
         jaddstr(reqjson,"method","roundend");
         jaddnum(reqjson,"round",vars->round);
-        BET_message_send("BET_round",bet->pubsock>=0?bet->pubsock:bet->pushsock,reqjson,1);
+        BET_message_send("BET_round",bet->pubsock>=0?bet->pubsock:bet->pushsock,reqjson,1,bet);
         vars->round++;
         vars->turni = 0;
         if ( vars->round >= bet->numrounds )
@@ -113,7 +125,7 @@ int32_t BET_client_gamestart(cJSON *argjson,struct privatebet_info *bet,struct p
         vcalc_sha256(0,vars->myhash.bytes,(uint8_t *)vars->mypermi,sizeof(*vars->mypermi) * bet->range);
     }
     jaddbits256(cmdjson,"hash",vars->myhash);
-    BET_message_send("BET_gamestarted",bet->pushsock,cmdjson,1);
+    BET_message_send("BET_gamestarted",bet->pushsock,cmdjson,1,bet);
     BET_statemachine_roundstart(bet,vars);
     return(0);
 }
@@ -136,7 +148,7 @@ int32_t BET_client_gamestarted(cJSON *argjson,struct privatebet_info *bet,struct
             reqjson = cJSON_CreateObject();
             jaddstr(reqjson,"method","perm");
             jadd(reqjson,"perm",array);
-            BET_message_send("BET_perm",bet->pubsock>=0?bet->pubsock:bet->pushsock,reqjson,1);
+            BET_message_send("BET_perm",bet->pubsock>=0?bet->pubsock:bet->pushsock,reqjson,1,bet);
         }
     }
     return(0);
@@ -259,7 +271,7 @@ int32_t BET_clientupdate(cJSON *argjson,uint8_t *ptr,int32_t recvlen,struct priv
         else if ( strcmp(method,"deali") == 0 )
             return(BET_client_deali(argjson,bet,vars,senderid));
         else if ( strcmp(method,"join") == 0 )
-            return(0);
+            return(BET_client_join(argjson,bet,vars,senderid));
         else if ( strcmp(method,"MofN") == 0 )
             return(BET_client_MofN(argjson,bet,vars,senderid));
         else if ( strcmp(method,"deckpacket") == 0 )
@@ -287,9 +299,9 @@ int32_t BET_clientupdate(cJSON *argjson,uint8_t *ptr,int32_t recvlen,struct priv
 
 void BET_clientloop(void *_ptr)
 {
-    int32_t nonz,recvlen; uint16_t port=0; char connectaddr[64],hostip[64]; void *ptr; cJSON *msgjson; struct privatebet_vars *VARS; struct privatebet_info *bet = _ptr;
+    int32_t nonz,recvlen; uint16_t port=7798; char connectaddr[64],hostip[64]; void *ptr; cJSON *msgjson; struct privatebet_vars *VARS; struct privatebet_info *bet = _ptr;
     VARS = calloc(1,sizeof(*VARS));
-    hostip[0] = 0;
+    strcpy(hostip,"");
     printf("client loop: pushsock.%d subsock.%d\n",bet->pushsock,bet->subsock);
     while ( 1 )
     {
@@ -317,6 +329,11 @@ void BET_clientloop(void *_ptr)
             bet->subsock = BET_nanosock(0,connectaddr,NN_SUB);
             BET_transportname(0,connectaddr,hostip,port+1);
             bet->pushsock = BET_nanosock(0,connectaddr,NN_PUSH);
+            reqjson = cJSON_CreateObject();
+            jaddbits256(reqjson,"pubkey",pubkey);
+            jaddstr(reqjson,"method","join");
+            jaddstr(reqjson,"peerid",LN_idstr);
+            BET_message_send("BET_havetable",bet->pushsock,reqjson,1,bet);
         }
         else
         {

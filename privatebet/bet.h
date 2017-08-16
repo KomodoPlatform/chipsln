@@ -243,7 +243,8 @@ https://crypto.stanford.edu/~pgolle/papers/poker.pdf
 #define CARDS777_MAXCARDS 255 //52    //
 #define CARDS777_MAXPLAYERS 2 //9   //
 #define CARDS777_MAXROUNDS 3 //9   //
-#define CARDS777_MAXCHIPS 100 
+#define CARDS777_MAXCHIPS 100
+#define CARDS777_CHIPSIZE (SATOSHIDEN / 100)
 #define BET_PLAYERTIMEOUT 15
 #define BET_GAMESTART_DELAY 3
 
@@ -265,33 +266,36 @@ struct privatebet_info
 {
     char game[64];
     bits256 MofN[CARDS777_MAXCARDS * CARDS777_MAXPLAYERS],cardpubs[CARDS777_MAXCARDS],playerpubs[CARDS777_MAXPLAYERS],tableid,deckid;
-    int32_t numplayers,maxplayers,numrounds,range,myplayerid;
+    int32_t numplayers,maxplayers,numrounds,range,myplayerid,maxchips,chipsize;
     int32_t pullsock,pubsock,subsock,pushsock;
+    char peerids[CARDS777_MAXPLAYERS][67];
 };
 
-struct privatebet_rhashes
+struct privatebet_rawpeerln
 {
-    int32_t numrhashes,numpaid,paid[CARDS777_MAXCHIPS * CARDS777_MAXPLAYERS];
-    bits256 rhashes[CARDS777_MAXCHIPS * CARDS777_MAXPLAYERS];
+    uint64_t msatoshi_to_us,msatoshi_total;
+    uint32_t unique_id;
+    char peerid[67],channel[64],netaddr[64],state[32];
 };
 
-struct privatebet_player
+struct privatebet_peerln
 {
-    int32_t state;
-    struct privatebet_rhashes sendchips,recvchips;
-    char ln_id[67],channel[64],netaddr[64];
+    int32_t numrhashes,numpaid;
+    bits256 hostrhash,clientrhash;
+    struct privatebet_rawpeerln raw;
 };
 
 struct privatebet_vars
 {
     bits256 myhash,hashes[CARDS777_MAXPLAYERS][2];
     int32_t permis[CARDS777_MAXPLAYERS][CARDS777_MAXCARDS];
-    struct privatebet_player players[CARDS777_MAXPLAYERS];
     uint32_t endround[CARDS777_MAXPLAYERS];
     cJSON *actions[CARDS777_MAXROUNDS][CARDS777_MAXPLAYERS];
     int32_t mypermi[CARDS777_MAXCARDS],permi[CARDS777_MAXCARDS],turni,round,validperms,roundready;
 };
 bits256 *BET_process_packet(bits256 *cardpubs,bits256 *deckidp,bits256 senderpub,bits256 mypriv,uint8_t *decoded,int32_t maxsize,bits256 mypub,uint8_t *sendbuf,int32_t size,int32_t checkplayers,int32_t range);
+cJSON *BET_hostrhashes(struct privatebet_info *bet);
+bits256 BET_clientrhash();
 
 int32_t BET_clientupdate(cJSON *argjson,uint8_t *ptr,int32_t recvlen,struct privatebet_info *bet,struct privatebet_vars *vars);
 int32_t BET_hostcommand(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars);
