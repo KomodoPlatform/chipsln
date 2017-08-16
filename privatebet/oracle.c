@@ -20,6 +20,7 @@ char *BET_gameresult(cJSON *argjson)
 
 char *BET_oracle_command(void *ctx,char *method,cJSON *argjson)
 {
+    printf("got oracle.(%s)\n",jprint(argjson,0));
     if ( strcmp(method,"createdeck") == 0 )
         return(BET_createdeck(argjson));
     else if ( strcmp(method,"gameresult") == 0 )

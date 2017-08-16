@@ -112,10 +112,12 @@ void BET_host_gamestart(struct privatebet_info *bet,struct privatebet_vars *vars
     jaddnum(reqjson,"numplayers",bet->numplayers);
     jaddnum(reqjson,"numrounds",bet->numrounds);
     jaddnum(reqjson,"range",bet->range);
+    printf("broadcast.(%s)\n",jprint(reqjson,0));
     BET_message_send("BET_start",bet->pubsock,reqjson,1,bet);
     deckjson = 0;
     if ( (reqjson= BET_createdeck_request(bet->playerpubs,bet->numplayers,bet->range)) != 0 )
     {
+        printf("call oracle\n");
         if ( (retstr= BET_oracle_request("createdeck",reqjson)) != 0 )
         {
             if ( (deckjson= cJSON_Parse(retstr)) != 0 )
@@ -308,7 +310,7 @@ void BET_hostloop(void *_ptr)
         }
         if ( Gamestarted == 0 )
         {
-            //printf(">>>>>>>>> t%u gamestart.%u numplayers.%d turni.%d round.%d\n",(uint32_t)time(NULL),Gamestart,bet->numplayers,VARS.turni,VARS.round);
+            printf(">>>>>>>>> t%u gamestart.%u numplayers.%d turni.%d round.%d\n",(uint32_t)time(NULL),Gamestart,bet->numplayers,VARS.turni,VARS.round);
             if ( time(NULL) > Gamestart && bet->numplayers > 1 && VARS->turni == 0 && VARS->round == 0 )
             {
                 Gamestarted = (uint32_t)time(NULL);
