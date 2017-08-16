@@ -70,7 +70,7 @@ int main(int argc,const char *argv[])
         if ( (LN_idstr= clonestr(jstr(infojson,"id"))) == 0 || strlen(LN_idstr) != 66 )
             printf("need 33 byte secp pubkey\n"), exit(-1);
         LN_port = juint(infojson,"port");
-        safecopy(LN_ipaddr,jstr(argjson,"ipaddr"),sizeof(LP_ipaddr));
+        safecopy(LN_ipaddr,jstr(argjson,"ipaddr"),sizeof(LN_ipaddr));
         printf("getinfo.(%s)\n",jprint(infojson,1));
     } else printf("need to have CHIPS and lightning running\n"), exit(-1);
     printf("help.(%s)\n",jprint(chipsln_help(),1));

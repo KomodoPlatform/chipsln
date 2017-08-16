@@ -220,7 +220,7 @@ int32_t BET_chipsln_update(struct privatebet_info *bet,struct privatebet_vars *v
             for (i=0; i<n&&Num_rawpeersln<CARDS777_MAXPLAYERS; i++)
             {
                 item = jitem(array,i);
-                if ( BET_rawpeerln_parse(&Rawpeersln[Num_Rawpeersln],item) == 0 )
+                if ( BET_rawpeerln_parse(&Rawpeersln[Num_rawpeersln],item) == 0 )
                     Num_Rawpeersln++;
             }
             if ( memcmp(Rawpeersln,oldRawpeersln,sizeof(Rawpeersln)) != 0 )
@@ -251,7 +251,7 @@ int32_t BET_chipsln_update(struct privatebet_info *bet,struct privatebet_vars *v
             }
             free_json(channels);
         }
-        free_json(peers);
+        free_json(rawpeers);
     }
     return(retval);
 }
