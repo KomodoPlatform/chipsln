@@ -13,11 +13,11 @@
  *                                                                            *
  ******************************************************************************/
 
-bits256 Clienthash;
+bits256 Clientrhash;
 
 bits256 BET_clientrhash()
 {
-    return(Clienthash);
+    return(Clientrhash);
 }
 
 int32_t BET_client_join(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars,int32_t senderid)
