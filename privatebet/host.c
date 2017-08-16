@@ -180,12 +180,13 @@ struct privatebet_peerln *BET_peerln_find(char *peerid)
 
 struct privatebet_peerln *BET_peerln_create(struct privatebet_rawpeerln *raw,int32_t maxplayers,int32_t maxchips,int32_t chipsize)
 {
-    struct privatebet_peerln *p; cJSON *inv;
+    struct privatebet_peerln *p; cJSON *inv; char label[64];
     p = &Peersln[Num_peersln++];
     p->raw = *raw;
     if ( IAMHOST != 0 )
     {
-        p->hostrhash = chipsln_rhash_create(chipsize,"0");
+        sprintf(label,"%s_%d",LN_idstr,0);
+        p->hostrhash = chipsln_rhash_create(chipsize,label);
     }
     return(p);
 }
