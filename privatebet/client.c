@@ -105,10 +105,10 @@ void BET_client_turninext(struct privatebet_info *bet,struct privatebet_vars *va
             printf("Game completed next start.%u vs %u\n------------------\n\n",Gamestart,(uint32_t)time(NULL));
         }
     }
-    if ( vars->turni == bet->myplayerid && vars->round < bet->numrounds && vars->roundready == vars->round )
+    /*if ( vars->turni == bet->myplayerid && vars->round < bet->numrounds && vars->roundready == vars->round )
     {
         BET_client_turnisend(bet,vars);
-    }
+    }*/
 }
 
 int32_t BET_client_turni(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars,int32_t senderid)
@@ -183,6 +183,8 @@ int32_t BET_client_gamestarted(cJSON *argjson,struct privatebet_info *bet,struct
             jaddstr(reqjson,"method","perm");
             jadd(reqjson,"perm",array);
             jaddbits256(reqjson,"pubkey",Mypubkey);
+            VARS->roundready = 0;
+            VARS->turni = 0;
             BET_message_send("BET_perm",bet->pubsock>=0?bet->pubsock:bet->pushsock,reqjson,1,bet);
         } //else printf("i.%d != num.%d senderid.%d process gamestarted.(%s) [sender.%d] <- %s\n",i,bet->numplayers,senderid,jprint(argjson,0),senderid,bits256_str(str,vars->hashes[senderid][0]));
     }
@@ -365,6 +367,10 @@ void BET_clientloop(void *_ptr)
                     lasttime = (uint32_t)time(NULL);
                 }
                 usleep(10000);
+                if ( VARS->validperms != 0 && VARS->turni == bet->myplayerid && VARS->roundready == VARS->round )
+                {
+                    BET_client_turnisend(bet,vars);
+                }
             }
         }
         else if ( hostip[0] != 0 && port > 0 )
