@@ -504,7 +504,7 @@ void register_opts(struct lightningd_state *dstate)
 	opt_register_version();
 
 	configdir_register_opts(dstate,&dstate->config_dir, &dstate->rpc_filename);
-    printf("RPC_FILENAME.(%s)\n",dstate->rpc_filename);
+    printf("(%s)/RPC_FILENAME.(%s)\n",dstate->config_dir,dstate->rpc_filename);
 	config_register_opts(dstate);
 	dev_register_opts(dstate);
 }
