@@ -41,7 +41,7 @@ void BET_sendpay(bits256 rhash,uint64_t satoshis)
 
 int32_t BET_client_join(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars,int32_t senderid)
 {
-    cJSON *array,*pubkeys,*retjson,*channels,*array,*item; int32_t i,n,len; bits256 hash; char *idstr,*source,*dest,*short_id;
+    cJSON *array,*pubkeys,*retjson,*channels,*item; int32_t i,n,len; bits256 hash; char *idstr,*source,*dest,*short_id;
     if ( Host_peerid[0] == 0 )
     {
         safecopy(Host_peerid,jstr(argjson,"hostid"),sizeof(Host_peerid));
