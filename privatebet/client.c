@@ -55,7 +55,7 @@ int32_t BET_client_join(cJSON *argjson,struct privatebet_info *bet,struct privat
                 {
                     item = jitem(array,i);
                     printf("(%s)\n",jprint(item,0));
-                    if ( (idstr= jstr(retjson,"peerid")) != 0 && strcmp(idstr,Host_peerid) == 0 )
+                    if ( (idstr= jstr(item,"peerid")) != 0 && strcmp(idstr,Host_peerid) == 0 )
                     {
                         already_connected = 1;
                         break;
