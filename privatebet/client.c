@@ -115,7 +115,7 @@ int32_t BET_client_turni(cJSON *argjson,struct privatebet_info *bet,struct priva
 {
     struct privatebet_vars argvars; int32_t n;
     printf("client TURNI.(%s) senderid.%d valid.%d\n",jprint(argjson,0),senderid,vars->validperms);
-    if ( vars->validperms != 0 && senderid >= 0 && senderid < bet->numplayers )
+    if ( (IAMHOST != 0 || vars->validperms != 0) && senderid >= 0 && senderid < bet->numplayers )
     {
         memset(&argvars,0,sizeof(argvars));
         BET_betvars_parse(bet,&argvars,argjson);
