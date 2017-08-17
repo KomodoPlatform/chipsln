@@ -13,15 +13,48 @@
  *                                                                            *
  ******************************************************************************/
 
-bits256 Clientrhash;
+bits256 Clientrhash,Hostrhashes[CARDS777_MAXPLAYERS];
 
 bits256 BET_clientrhash()
 {
     return(Clientrhash);
 }
 
+void BET_sendpay(bits256 rhash,uint64_t satoshis)
+{
+    // if no route, get route
+    // replace rhash in route
+    // chipsln_sendpay()
+}
+
 int32_t BET_client_join(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars,int32_t senderid)
 {
+    cJSON *array,*pubkeys; int32_t i,n;
+    if ( Host_peerid[0] == 0 )
+    {
+        safecopy(Host_ipaddr,jstr(argjson,"hostip",sizeof(Host_ipaddr)));
+        safecopy(Host_peerid,jstr(argjson,"hostid",sizeof(Host_peerid)));
+        chipsln_connect(Host_ipaddr,LN_port,Host_peerid);
+        // if error, clear Host_peerid
+        // else open channel
+    }
+    if ( (array= jarray(&n,argjson,"hostrhash")) != 0 )
+    {
+        for (i=0; i<n; i++)
+            Hostrhashes[i] = jbits256i(array,i);
+        if ( (array= jarray(&n,argjson,"pubkeys")) != 0 && bet->chipsize == jint(argjson,"chipsize") )
+        {
+            for (i=0; i<n; i++)
+            {
+                hash = jbits256i(array,i);
+                if ( bits256_cmp(hash,Mypubkey) == 0 )
+                {
+                    BET_sendpay(Hostrhashes[i],bet->chipsize);
+                    break;
+                }
+            }
+        }
+    }
     printf("JOIN broadcast.(%s)\n",jprint(argjson,0));
     return(0);
 }
@@ -177,9 +210,9 @@ int32_t BET_client_perm(cJSON *argjson,struct privatebet_info *bet,struct privat
         {
             vars->validperms = 1;
             j = BET_permutation_sort(vars->permi,vars->permis,bet->numplayers,bet->range);
-            //for (i=0; i<bet->range; i++)
-            //    printf("%d ",vars->permi[i]);
-            //printf("validated perms best.%d\n",j);
+            for (i=0; i<bet->range; i++)
+                printf("%d ",vars->permi[i]);
+            printf("validated perms best.%d\n",j);
             if ( vars->turni == bet->myplayerid && vars->round == 0 )
                 BET_client_turnisend(bet,vars);
         }
@@ -301,7 +334,7 @@ void BET_clientloop(void *_ptr)
 {
     int32_t nonz,recvlen; uint16_t port=7798; char connectaddr[64],hostip[64]; void *ptr; cJSON *msgjson,*reqjson; struct privatebet_vars *VARS; struct privatebet_info *bet = _ptr;
     VARS = calloc(1,sizeof(*VARS));
-    strcpy(hostip,"5.9.253.195"); // get from BET blockchain
+    strcpy(hostip,"5.9.253.195"); // jl777: get from BET blockchain
     printf("client loop: pushsock.%d subsock.%d\n",bet->pushsock,bet->subsock);
     while ( 1 )
     {

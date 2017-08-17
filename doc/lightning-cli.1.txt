@@ -19,7 +19,7 @@ OPTIONS
 -------
 *--lightning-dir*='DIR'::
   Set the directory for the lightning daemon we're talking to; defaults to
-  '$HOME/.lightning'.
+  '$HOME/.chipsln'.
 *--rpc-file*='FILE'::
   Named pipe to use to to talk to lightning daemon: default is 'lightning-rpc'
   in the lightning directory.

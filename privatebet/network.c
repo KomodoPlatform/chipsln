@@ -13,6 +13,13 @@
  *                                                                            *
  ******************************************************************************/
 
+cJSON *BET_pubkeys(struct privatebet_info *bet)
+{
+    int32_t i; cJSON *array = cJSON_CreateArray();
+    for (i=0; i<bet->numplayers; i++)
+        jaddibits256(array,bet->pubkeys[i]);
+    return(array);
+}
 
 void BET_message_send(char *debugstr,int32_t sock,cJSON *msgjson,int32_t freeflag,struct privatebet_info *bet)
 {
@@ -25,12 +32,26 @@ void BET_message_send(char *debugstr,int32_t sock,cJSON *msgjson,int32_t freefla
     jaddstr(msgjson,"peerid",LN_idstr);
     if ( jobj(msgjson,"hostrhash") != 0 )
         jdelete(msgjson,"hostrhash");
+    if ( jobj(msgjson,"pubkeys") != 0 )
+        jdelete(msgjson,"pubkeys");
     if ( jobj(msgjson,"clientrhash") != 0 )
         jdelete(msgjson,"clientrhash");
+    if ( jobj(msgjson,"chipsize") != 0 )
+        jdelete(msgjson,"chipsize");
+    if ( jobj(msgjson,"hostip") != 0 )
+        jdelete(msgjson,"hostip");
+    if ( jobj(msgjson,"hostid") != 0 )
+        jdelete(msgjson,"hostid");
+    if ( jobj(msgjson,"LN_port") != 0 )
+        jdelete(msgjson,"LN_port");
     if ( IAMHOST != 0 )
     {
         jadd(msgjson,"hostrhash",BET_hostrhashes(bet));
+        jadd(msgjson,"pubkeys",BET_pubkeys(bet));
         jaddnum(msgjson,"LN_port",LN_port);
+        jaddnum(msgjson,"chipsize",chipsize);
+        jaddstr(msgjson,"hostip",Host_ipaddr);
+        jaddstr(msgjson,"hostid",Host_peerid);
     } else jaddbits256(msgjson,"clientrhash",BET_clientrhash());
     msg = jprint(msgjson,freeflag);
     len = (int32_t)strlen(msg) + 1;

@@ -15,7 +15,7 @@
 
 
 #include "bet.h"
-char *LN_idstr,BET_ORACLEURL[64] = "127.0.0.1:7797";
+char *LN_idstr,Host_ipaddr[64],Host_peerid[67],BET_ORACLEURL[64] = "127.0.0.1:7797";
 uint16_t LN_port;
 int32_t Gamestart,Gamestarted,Lastturni,Maxrounds = 3,Maxplayers = 2;
 uint8_t BET_logs[256],BET_exps[510];
@@ -107,6 +107,7 @@ int main(int argc,const char *argv[])
                     BET_transportname(1,bindaddr,hostip,port+1);
                     pullsock = BET_nanosock(1,bindaddr,NN_PULL);
                     IAMHOST = 1;
+                    strcpy(Host_ipaddr,hostip,sizeof(Host_ipaddr));
                     // publish to BET chain
                 }
                 else if ( strcmp(modestr,"oracle") == 0 )

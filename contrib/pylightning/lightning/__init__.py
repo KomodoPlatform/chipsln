@@ -1,1 +1,1 @@
-from .lightning import LightningRpc, LegacyLightningRpc
+from .chipsln import LightningRpc, LegacyLightningRpc
