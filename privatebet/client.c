@@ -32,8 +32,8 @@ int32_t BET_client_join(cJSON *argjson,struct privatebet_info *bet,struct privat
     cJSON *array,*pubkeys; int32_t i,n; bits256 hash;
     if ( Host_peerid[0] == 0 )
     {
-        safecopy(Host_ipaddr,jstr(argjson,"hostip"),sizeof(Host_ipaddr)));
-        safecopy(Host_peerid,jstr(argjson,"hostid"),sizeof(Host_peerid)));
+        safecopy(Host_ipaddr,jstr(argjson,"hostip"),sizeof(Host_ipaddr));
+        safecopy(Host_peerid,jstr(argjson,"hostid"),sizeof(Host_peerid));
         chipsln_connect(Host_ipaddr,LN_port,Host_peerid);
         // if error, clear Host_peerid
         // else open channel
