@@ -14,6 +14,7 @@
  ******************************************************************************/
 
 bits256 Clientrhash,Hostrhashes[CARDS777_MAXPLAYERS+1];
+char Host_channel[64];
 
 bits256 BET_clientrhash()
 {
@@ -22,14 +23,25 @@ bits256 BET_clientrhash()
 
 void BET_sendpay(bits256 rhash,uint64_t satoshis)
 {
-    // if no route, get route
+    cJSON *routejson,*retjson;
+    routejson = cJSON_CreateObject();
+    jaddstr(routejson,"id",Host_peerid);
+    jaddstr(routejson,"channel",Host_channel);
+    jaddnum(routejson,"msatoshi",satoshis*1000);
+    jaddnum(routejson,"delay",10);
+    // route { "id" : "02779b57b66706778aa1c7308a817dc080295f3c2a6af349bb1114b8be328c28dc", "channel" : "27446:1:0", "msatoshi" : 1000000, "delay" : 10 }
     // replace rhash in route
-    // chipsln_sendpay()
+    if ( (retjson= chipsln_sendpay(routejson,rhash)) != 0 )
+    {
+        printf("sendpay %.8f to %s -> %s\n",dstr(satoshis),jprint(routejson,0),jprint(retjson,0));
+        free_json(retjson);
+    }
+    free_json(routejson);
 }
 
 int32_t BET_client_join(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars,int32_t senderid)
 {
-    cJSON *array,*pubkeys,*retjson; int32_t i,n; bits256 hash; char *idstr;
+    cJSON *array,*pubkeys,*retjson,*channels,*array,*item; int32_t i,n,len; bits256 hash; char *idstr,*source,*dest,*short_id;
     if ( Host_peerid[0] == 0 )
     {
         safecopy(Host_peerid,jstr(argjson,"hostid"),sizeof(Host_peerid));
@@ -38,6 +50,32 @@ int32_t BET_client_join(cJSON *argjson,struct privatebet_info *bet,struct privat
             printf("(%s:%u %s) CONNECTLN.(%s)\n",Host_ipaddr,LN_port,Host_peerid,jprint(retjson,0));
             if ( (idstr= jstr(retjson,"id")) != 0 && strcmp(idstr,Host_peerid) == 0 )
             {
+                if ( (channels= chipsln_getchannels()) != 0 )
+                {
+                    if ( (array= jarray(&n,channels,"channels")) != 0 )
+                    {
+                        for (i=0; i<n; i++)
+                        {
+                            item = jitem(array,i);
+                            source = jstr(item,"source");
+                            dest = jstr(item,"destination");
+                            short_id = jstr(item,"short_id");
+                            if ( source != 0 && dest != 0 && strcmp(source,LN_idstr) == 0 && strcmp(dest,Host_peerid) == 0 && short_id != 0 )
+                            {
+                                len = strlen(short_id);
+                                if ( len > 3 && short_id[len-3] == '/' )
+                                {
+                                    strcpy(Host_channel,short_id);
+                                    Host_channel[len-3] = 0;
+                                    printf("Host_channel.(%s)\n",Host_channel);
+                                }
+                            }
+                        }
+                    }
+                    free_json(channels);
+                }
+                //{ "channels" :[{ "source" : "02779b57b66706778aa1c7308a817dc080295f3c2a6af349bb1114b8be328c28dc", "destination" : "03b03efcf647e6dd48b949e5b1f7e9e064257a5c48c2d56b1334b283b48338f821", "active" : true, "fee_per_kw" : 10, "last_update" : 1502988553, "flags" : 0, "delay" : 10, "short_id" : "27446:1:0/0" }, { "source" : "03b03efcf647e6dd48b949e5b1f7e9e064257a5c48c2d56b1334b283b48338f821", "destination" : "02779b57b66706778aa1c7308a817dc080295f3c2a6af349bb1114b8be328c28dc", "active" : true, "fee_per_kw" : 10, "last_update" : 1502988553, "flags" : 1, "delay" : 10, "short_id" : "27446:1:0/1" } ] }
+                
             } else Host_peerid[0] = 0;
             free_json(retjson);
         }
@@ -52,8 +90,9 @@ int32_t BET_client_join(cJSON *argjson,struct privatebet_info *bet,struct privat
             for (i=0; i<n; i++)
             {
                 hash = jbits256i(array,i);
-                if ( bits256_cmp(hash,Mypubkey) == 0 )
+                if ( bits256_cmp(hash,Mypubkey) == 0 && Host_peerid[0] != 0 && Host_channel[0] != 0 )
                 {
+                    printf("BET_sendpay\n");
                     BET_sendpay(Hostrhashes[i],bet->chipsize);
                     break;
                 }
