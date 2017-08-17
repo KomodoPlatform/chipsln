@@ -599,7 +599,7 @@ void setup_jsonrpc(struct lightningd_state *dstate, const char *rpc_filename)
 {
 	struct sockaddr_un addr;
 	int fd, old_umask;
-
+printf("setup_jsonrpc.(%s)\n",rpc_filename);
 	if (streq(rpc_filename, ""))
 		return;
 
