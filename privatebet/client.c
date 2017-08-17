@@ -79,7 +79,7 @@ void BET_client_turnisend(struct privatebet_info *bet,struct privatebet_vars *va
 void BET_client_turninext(struct privatebet_info *bet,struct privatebet_vars *vars)
 {
     cJSON *reqjson;
-    //printf("BET_turni_next (%d, %d) numplayers.%d range.%d\n",Turni,Round,Numplayers,Range);
+    printf("BET_turni_next (%d, %d) numplayers.%d range.%d\n",vars->turni,vars->round,vars->numplayers,vars->range);
     if ( IAMHOST == 0 && vars->validperms == 0 )
         return;
     if ( bits256_cmp(bet->tableid,Mypubkey) != 0 )
@@ -114,8 +114,8 @@ void BET_client_turninext(struct privatebet_info *bet,struct privatebet_vars *va
 int32_t BET_client_turni(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars,int32_t senderid)
 {
     struct privatebet_vars argvars; int32_t n;
-    printf("client TURNI.(%s) senderid.%d valid.%d\n",jprint(argjson,0),senderid,vars->validperms);
-    if ( vars->validperms != 0 && senderid >= 0 && senderid < bet->numplayers )
+    //printf("client TURNI.(%s) senderid.%d valid.%d\n",jprint(argjson,0),senderid,vars->validperms);
+    if ( (IAMHOST != 0 || vars->validperms != 0) && senderid >= 0 && senderid < bet->numplayers )
     {
         memset(&argvars,0,sizeof(argvars));
         BET_betvars_parse(bet,&argvars,argjson);
