@@ -308,7 +308,7 @@ void BET_hostloop(void *_ptr)
                 //BETS_players_update(bet,VARS);
             }
             printf("%s round.%d turni.%d myid.%d\n",bet->game,VARS->round,VARS->turni,bet->myplayerid);
-            //sleep(5);
+            sleep(5);
         }
         if ( Gamestarted == 0 )
         {
