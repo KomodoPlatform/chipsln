@@ -356,7 +356,7 @@ void BET_clientloop(void *_ptr)
             }
             if ( nonz == 0 )
             {
-                printf("%s round.%d turni.%d myid.%d | valid.%d\n",bet->game,VARS->round,VARS->turni,bet->myplayerid,VARS->validperm);
+                printf("%s round.%d turni.%d myid.%d | valid.%d\n",bet->game,VARS->round,VARS->turni,bet->myplayerid,VARS->validperms);
                 usleep(5000000);
             }
         }
