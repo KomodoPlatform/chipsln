@@ -109,6 +109,7 @@ int main(int argc, char *argv[])
 		       get_peer_min_block(dstate));
 
 	/* Create RPC socket (if any) */
+    printf("call jsonrpc\n");
 	setup_jsonrpc(dstate, dstate->rpc_filename);
 
 	/* Set up connections from peers (if dstate->portnum is set) */

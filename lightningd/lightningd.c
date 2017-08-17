@@ -272,7 +272,8 @@ int main(int argc, char *argv[])
 		       0);
 
 	/* Create RPC socket (if any) */
-	setup_jsonrpc(&ld->dstate, ld->dstate.rpc_filename);
+    printf("call jsonrpc\n");
+    setup_jsonrpc(&ld->dstate, ld->dstate.rpc_filename);
 
 	/* Ready for connections from peers. */
 	setup_listeners(ld);
