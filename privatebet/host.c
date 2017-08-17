@@ -15,7 +15,7 @@
 
 struct privatebet_rawpeerln Rawpeersln[CARDS777_MAXPLAYERS+1],oldRawpeersln[CARDS777_MAXPLAYERS+1];
 struct privatebet_peerln Peersln[CARDS777_MAXPLAYERS+1];
-int32_t Num_rawpeersln,oldNum_rawpeersln,Num_peersln;
+int32_t Num_rawpeersln,oldNum_rawpeersln,Num_peersln,Numgames;
 
 struct privatebet_peerln *BET_peerln_find(char *peerid)
 {
@@ -326,6 +326,8 @@ void BET_hostloop(void *_ptr)
             //printf(">>>>>>>>> t%u gamestart.%u numplayers.%d turni.%d round.%d\n",(uint32_t)time(NULL),Gamestart,bet->numplayers,VARS->turni,VARS->round);
             if ( time(NULL) >= Gamestart && bet->numplayers > 1 && VARS->turni == 0 && VARS->round == 0 )
             {
+                printf("GAME.%d\n",Numgames);
+                Numgames++;
                 Gamestarted = (uint32_t)time(NULL);
                 BET_host_gamestart(bet,VARS);
             }
