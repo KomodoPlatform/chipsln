@@ -92,6 +92,7 @@ void BET_client_turninext(struct privatebet_info *bet,struct privatebet_vars *va
         reqjson = cJSON_CreateObject();
         jaddstr(reqjson,"method","roundend");
         jaddnum(reqjson,"round",vars->round);
+        jaddbits256(reqjson,"pubkey",Mypubkey);
         BET_message_send("BET_round",bet->pubsock>=0?bet->pubsock:bet->pushsock,reqjson,1,bet);
         vars->round++;
         vars->turni = 0;
@@ -181,7 +182,7 @@ int32_t BET_client_gamestarted(cJSON *argjson,struct privatebet_info *bet,struct
             reqjson = cJSON_CreateObject();
             jaddstr(reqjson,"method","perm");
             jadd(reqjson,"perm",array);
-            printf("send perm\n");
+            jaddbits256(reqjson,"pubkey",Mypubkey);
             BET_message_send("BET_perm",bet->pubsock>=0?bet->pubsock:bet->pushsock,reqjson,1,bet);
         } //else printf("i.%d != num.%d senderid.%d process gamestarted.(%s) [sender.%d] <- %s\n",i,bet->numplayers,senderid,jprint(argjson,0),senderid,bits256_str(str,vars->hashes[senderid][0]));
     }
