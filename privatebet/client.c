@@ -83,6 +83,7 @@ int32_t BET_client_join(cJSON *argjson,struct privatebet_info *bet,struct privat
                         source = jstr(item,"source");
                         dest = jstr(item,"destination");
                         short_id = jstr(item,"short_id");
+                        printf("source.%s dest.%s myid.%s Host.%s short.%s\n",source,dest,LN_idstr,Host_peerid,short_id);
                         if ( source != 0 && dest != 0 && strcmp(source,LN_idstr) == 0 && strcmp(dest,Host_peerid) == 0 && short_id != 0 )
                         {
                             len = strlen(short_id);
