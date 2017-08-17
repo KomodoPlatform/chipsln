@@ -202,9 +202,9 @@ class LegacyLightningRpc(UnixDomainSocketRpc):
         return self._call("newaddr", [])
 
 if __name__ == "__main__":
-    l1 = LightningRpc("/tmp/lightning1/lightning-rpc")
+    l1 = LightningRpc("/tmp/lightning1/chipsln-rpc")
     l1.connect_rpc()
-    l5 = LightningRpc("/tmp/lightning5/lightning-rpc")
+    l5 = LightningRpc("/tmp/lightning5/chipsln-rpc")
     l5.connect_rpc()
 
     import random

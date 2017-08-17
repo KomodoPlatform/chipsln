@@ -91,7 +91,7 @@ class NodeFactory(object):
         lightning_dir = os.path.join(
             TEST_DIR, self.func._testMethodName, "lightning-{}/".format(node_id))
 
-        socket_path = os.path.join(lightning_dir, "lightning-rpc").format(node_id)
+        socket_path = os.path.join(lightning_dir, "chipsln-rpc").format(node_id)
         port = 16330+node_id
         if legacy:
             daemon = utils.LegacyLightningD(lightning_dir, bitcoind.bitcoin_dir, port=port)
