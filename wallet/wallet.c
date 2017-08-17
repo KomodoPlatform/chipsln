@@ -169,7 +169,7 @@ const struct utxo **wallet_select_coins(const tal_t *ctx, struct wallet *w,
 		if (satoshi_in >= *fee_estimate + value)
 			break;
 	}
-    printf("satoshi_in %llu\n",(long long)satosho_in);
+    printf("satoshi_in %llu\n",(long long)satoshi_in);
 	tal_free(available);
 
 	if (satoshi_in < *fee_estimate + value) {
