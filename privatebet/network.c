@@ -126,7 +126,7 @@ void BET_MofN_item(bits256 deckid,int32_t cardi,bits256 *cardpubs,int32_t numcar
 
 bits256 *BET_process_packet(bits256 *cardpubs,bits256 *deckidp,bits256 senderpub,bits256 mypriv,uint8_t *decoded,int32_t maxsize,bits256 mypub,uint8_t *sendbuf,int32_t size,int32_t checkplayers,int32_t range)
 {
-    int32_t j,k,i,n,slen,recvlen,numplayers,numcards,myid=-1; uint8_t *recv; bits256 *MofN,deckid,checkpub,playerpubs[CARDS777_MAXPLAYERS]; cJSON *deckjson,*array; char str[65],str2[65];
+    int32_t j,k,i,n,slen,recvlen,numplayers,numcards,myid=-1; uint8_t *recv; bits256 *MofN,deckid,checkpub,playerpubs[CARDS777_MAXPLAYERS+1]; cJSON *deckjson,*array; char str[65],str2[65];
     slen = (int32_t)strlen((char *)sendbuf);
     if ( (deckjson= cJSON_Parse((char *)sendbuf)) == 0 )
     {

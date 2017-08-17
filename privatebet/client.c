@@ -13,7 +13,7 @@
  *                                                                            *
  ******************************************************************************/
 
-bits256 Clientrhash,Hostrhashes[CARDS777_MAXPLAYERS];
+bits256 Clientrhash,Hostrhashes[CARDS777_MAXPLAYERS+1];
 
 bits256 BET_clientrhash()
 {
@@ -268,7 +268,9 @@ int32_t BET_client_MofN(cJSON *argjson,struct privatebet_info *bet,struct privat
 
 int32_t BET_senderid(cJSON *argjson,struct privatebet_info *bet)
 {
-    int32_t i;
+    int32_t i; char *peerid = jstr(argjson,"peerid");
+    if ( peerid != 0 && strcmp(Host_peerid,peerid) == 0 )
+        return(bet->maxplayers);
     for (i=0; i<bet->numplayers; i++)
         if ( bits256_cmp(jbits256(argjson,"sender"),bet->playerpubs[i]) == 0 )
             return(i);

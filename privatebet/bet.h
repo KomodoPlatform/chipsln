@@ -265,10 +265,10 @@ struct gfshare_ctx
 struct privatebet_info
 {
     char game[64];
-    bits256 MofN[CARDS777_MAXCARDS * CARDS777_MAXPLAYERS],cardpubs[CARDS777_MAXCARDS],playerpubs[CARDS777_MAXPLAYERS],tableid,deckid;
+    bits256 MofN[CARDS777_MAXCARDS * CARDS777_MAXPLAYERS],cardpubs[CARDS777_MAXCARDS],playerpubs[CARDS777_MAXPLAYERS+1],tableid,deckid;
     int32_t numplayers,maxplayers,numrounds,range,myplayerid,maxchips,chipsize;
     int32_t pullsock,pubsock,subsock,pushsock;
-    char peerids[CARDS777_MAXPLAYERS][67];
+    char peerids[CARDS777_MAXPLAYERS+1][67];
 };
 
 struct privatebet_rawpeerln
@@ -287,10 +287,10 @@ struct privatebet_peerln
 
 struct privatebet_vars
 {
-    bits256 myhash,hashes[CARDS777_MAXPLAYERS][2];
-    int32_t permis[CARDS777_MAXPLAYERS][CARDS777_MAXCARDS];
-    uint32_t endround[CARDS777_MAXPLAYERS];
-    cJSON *actions[CARDS777_MAXROUNDS][CARDS777_MAXPLAYERS];
+    bits256 myhash,hashes[CARDS777_MAXPLAYERS+1][2];
+    int32_t permis[CARDS777_MAXPLAYERS+1][CARDS777_MAXCARDS];
+    uint32_t endround[CARDS777_MAXPLAYERS+1];
+    cJSON *actions[CARDS777_MAXROUNDS][CARDS777_MAXPLAYERS+1];
     int32_t mypermi[CARDS777_MAXCARDS],permi[CARDS777_MAXCARDS],turni,round,validperms,roundready;
 };
 bits256 *BET_process_packet(bits256 *cardpubs,bits256 *deckidp,bits256 senderpub,bits256 mypriv,uint8_t *decoded,int32_t maxsize,bits256 mypub,uint8_t *sendbuf,int32_t size,int32_t checkplayers,int32_t range);

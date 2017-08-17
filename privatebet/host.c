@@ -13,8 +13,8 @@
  *                                                                            *
  ******************************************************************************/
 
-struct privatebet_rawpeerln Rawpeersln[CARDS777_MAXPLAYERS],oldRawpeersln[CARDS777_MAXPLAYERS];
-struct privatebet_peerln Peersln[CARDS777_MAXPLAYERS];
+struct privatebet_rawpeerln Rawpeersln[CARDS777_MAXPLAYERS+1],oldRawpeersln[CARDS777_MAXPLAYERS+1];
+struct privatebet_peerln Peersln[CARDS777_MAXPLAYERS+1];
 int32_t Num_rawpeersln,oldNum_rawpeersln,Num_peersln;
 
 struct privatebet_peerln *BET_peerln_find(char *peerid)
