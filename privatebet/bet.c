@@ -151,7 +151,6 @@ int main(int argc,const char *argv[])
                     fclose(fp);
                 }
             }
-            safecopy(Host_ipaddr,hostip,sizeof(Host_ipaddr));
             printf("passphrase.(%s) pushsock.%d subsock.%d hostip.(%s)\n",passphrase,pushsock,subsock,hostip);
             conv_NXTpassword(privkey.bytes,pubkey.bytes,(uint8_t *)passphrase,(int32_t)strlen(passphrase));
             bitcoin_priv2pub(bitcoin_ctx(),pubkey33,smartaddr,privkey,taddr,pubtype);
