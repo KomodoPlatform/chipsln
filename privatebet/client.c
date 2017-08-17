@@ -167,6 +167,7 @@ int32_t BET_client_gamestart(cJSON *argjson,struct privatebet_info *bet,struct p
 int32_t BET_client_gamestarted(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars,int32_t senderid)
 {
     int32_t i; cJSON *array,*reqjson; char str[65];
+    printf("gamestarted.%d\n",senderid);
     if ( senderid >= 0 && senderid <= bet->numplayers )
     {
         vars->hashes[senderid][0] = jbits256(argjson,"hash");
@@ -213,8 +214,8 @@ int32_t BET_client_perm(cJSON *argjson,struct privatebet_info *bet,struct privat
             for (i=0; i<bet->range; i++)
                 printf("%d ",vars->permi[i]);
             printf("validated perms best.%d\n",j);
-            if ( vars->turni == bet->myplayerid && vars->round == 0 )
-                BET_client_turnisend(bet,vars);
+            /*if ( vars->turni == bet->myplayerid && vars->round == 0 )
+                BET_client_turnisend(bet,vars);*/
         }
     }
     return(0);
@@ -234,8 +235,8 @@ int32_t BET_client_endround(cJSON *argjson,struct privatebet_info *bet,struct pr
         {
             vars->roundready++;
             BET_statemachine_roundstart(bet,vars);
-            if ( vars->turni == bet->myplayerid && vars->round == vars->roundready && vars->round < bet->numrounds )
-                BET_client_turnisend(bet,vars);
+            /*if ( vars->turni == bet->myplayerid && vars->round == vars->roundready && vars->round < bet->numrounds )
+                BET_client_turnisend(bet,vars);*/
         }
     }
     return(0);
