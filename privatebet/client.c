@@ -268,11 +268,11 @@ int32_t BET_client_MofN(cJSON *argjson,struct privatebet_info *bet,struct privat
 int32_t BET_senderid(cJSON *argjson,struct privatebet_info *bet)
 {
     int32_t i; char *peerid = jstr(argjson,"peerid");
-    if ( peerid != 0 && strcmp(Host_peerid,peerid) == 0 )
-        return(bet->maxplayers);
     for (i=0; i<bet->numplayers; i++)
         if ( bits256_cmp(jbits256(argjson,"pubkey"),bet->playerpubs[i]) == 0 )
             return(i);
+    if ( peerid != 0 && strcmp(Host_peerid,peerid) == 0 )
+        return(bet->maxplayers);
     return(-1);
 }
 
