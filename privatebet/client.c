@@ -36,7 +36,7 @@ int32_t BET_client_join(cJSON *argjson,struct privatebet_info *bet,struct privat
         safecopy(Host_peerid,jstr(argjson,"hostid"),sizeof(Host_peerid));
         if ( (retjson= chipsln_connect(Host_ipaddr,LN_port,Host_peerid)) != 0 )
         {
-            printf("CONNECTLN.(%s)\n",jprint(rejson,0));
+            printf("CONNECTLN.(%s)\n",jprint(retjson,0));
             free_json(retjson);
         }
         // if error, clear Host_peerid
