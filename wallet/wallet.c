@@ -16,8 +16,7 @@ struct wallet *wallet_new(const tal_t *ctx, struct log *log)
 	return wallet;
 }
 
-bool wallet_add_utxo(struct wallet *w, struct utxo *utxo,
-		     enum wallet_output_type type)
+bool wallet_add_utxo(struct wallet *w, struct utxo *utxo,enum wallet_output_type type)
 {
 	tal_t *tmpctx = tal_tmpctx(w);
 	char *hextxid = tal_hexstr(tmpctx, &utxo->txid, 32);
