@@ -89,10 +89,10 @@ int32_t BET_client_join(cJSON *argjson,struct privatebet_info *bet,struct privat
                         if ( source != 0 && dest != 0 && strcmp(source,LN_idstr) == 0 && strcmp(dest,Host_peerid) == 0 && short_id != 0 )
                         {
                             len = strlen(short_id);
-                            if ( len > 3 && short_id[len-3] == '/' )
+                            if ( len > 3 && short_id[len-2] == '/' )
                             {
                                 strcpy(Host_channel,short_id);
-                                Host_channel[len-3] = 0;
+                                Host_channel[len-2] = 0;
                                 printf("Host_channel.(%s)\n",Host_channel);
                             }
                         }
