@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
         {
             printf("%s\n",buffer);
             retval = 1;
-        } else printf("error from cli_main\n");
+        } else printf("error from cli_main.(%s)\n",buffer);
         free(buffer);
     }
     return(retval);

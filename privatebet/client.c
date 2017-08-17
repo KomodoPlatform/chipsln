@@ -29,16 +29,18 @@ void BET_sendpay(bits256 rhash,uint64_t satoshis)
 
 int32_t BET_client_join(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars,int32_t senderid)
 {
-    cJSON *array,*pubkeys,*retjson; int32_t i,n; bits256 hash;
+    cJSON *array,*pubkeys,*retjson; int32_t i,n; bits256 hash; char *idstr;
     if ( Host_peerid[0] == 0 )
     {
         safecopy(Host_peerid,jstr(argjson,"hostid"),sizeof(Host_peerid));
         if ( (retjson= chipsln_connect(Host_ipaddr,LN_port,Host_peerid)) != 0 )
         {
             printf("(%s:%u %s) CONNECTLN.(%s)\n",Host_ipaddr,LN_port,Host_peerid,jprint(retjson,0));
+            if ( (idstr= jstr(retjson,"id")) != 0 && strcmp(idstr,Host_peerid) == 0 )
+            {
+            } else Host_peerid[0] = 0;
             free_json(retjson);
         }
-        // if error, clear Host_peerid
         // else open channel
     }
     if ( (array= jarray(&n,argjson,"hostrhash")) != 0 )
