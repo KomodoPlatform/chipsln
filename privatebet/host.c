@@ -99,7 +99,10 @@ int32_t BET_hostcommand(cJSON *argjson,struct privatebet_info *bet,struct privat
         if ( strcmp(method,"join") == 0 )
             return(BET_host_join(argjson,bet,vars));
         else if ( strcmp(method,"turni") == 0 )
-            return(BET_client_turni(argjson,bet,vars,senderid));
+        {
+            BET_client_turni(argjson,bet,vars,senderid);
+            return(1);
+        }
         else if ( strcmp(method,"tablestatus") == 0 )
             return(0);
         else return(1);
