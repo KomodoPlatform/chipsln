@@ -182,7 +182,8 @@ Hostloop:
 
 void BETS_players_update(struct privatebet_info *bet,struct privatebet_vars *vars)
 {
-    int32_t i;     for (i=0; i<bet->numplayers; i++)
+    int32_t i;
+    for (i=0; i<bet->numplayers; i++)
     {
         /*update state: new, initial tip, active lasttime, missing, dead
         if ( dead for more than 5 minutes )

@@ -167,9 +167,8 @@ int32_t BET_client_gamestart(cJSON *argjson,struct privatebet_info *bet,struct p
 int32_t BET_client_gamestarted(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars,int32_t senderid)
 {
     int32_t i; cJSON *array,*reqjson;
-    if ( senderid >= 0 && senderid < bet->numplayers )
+    if ( senderid >= 0 && senderid <= bet->numplayers )
     {
-        //printf("senderid.%d process gamestarted.(%s)\n",senderid,jprint(argjson,0));
         vars->hashes[senderid][0] = jbits256(argjson,"hash");
         for (i=0; i<bet->numplayers; i++)
             if ( bits256_nonz(vars->hashes[i][0]) == 0 )
@@ -183,7 +182,7 @@ int32_t BET_client_gamestarted(cJSON *argjson,struct privatebet_info *bet,struct
             jaddstr(reqjson,"method","perm");
             jadd(reqjson,"perm",array);
             BET_message_send("BET_perm",bet->pubsock>=0?bet->pubsock:bet->pushsock,reqjson,1,bet);
-        }
+        } else printf("i.%d != num.%d senderid.%d process gamestarted.(%s)\n",i,bet->numplayers,senderid,jprint(argjson,0));
     }
     return(0);
 }
