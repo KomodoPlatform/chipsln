@@ -183,8 +183,8 @@ int32_t BET_client_gamestarted(cJSON *argjson,struct privatebet_info *bet,struct
             jaddstr(reqjson,"method","perm");
             jadd(reqjson,"perm",array);
             jaddbits256(reqjson,"pubkey",Mypubkey);
-            VARS->roundready = 0;
-            VARS->turni = 0;
+            vars->roundready = 0;
+            vars->turni = 0;
             BET_message_send("BET_perm",bet->pubsock>=0?bet->pubsock:bet->pushsock,reqjson,1,bet);
         } //else printf("i.%d != num.%d senderid.%d process gamestarted.(%s) [sender.%d] <- %s\n",i,bet->numplayers,senderid,jprint(argjson,0),senderid,bits256_str(str,vars->hashes[senderid][0]));
     }
@@ -369,7 +369,7 @@ void BET_clientloop(void *_ptr)
                 usleep(10000);
                 if ( VARS->validperms != 0 && VARS->turni == bet->myplayerid && VARS->roundready == VARS->round )
                 {
-                    BET_client_turnisend(bet,vars);
+                    BET_client_turnisend(bet,VARS);
                 }
             }
         }
