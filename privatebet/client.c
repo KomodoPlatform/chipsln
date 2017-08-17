@@ -23,20 +23,21 @@ bits256 BET_clientrhash()
 
 void BET_sendpay(bits256 rhash,uint64_t satoshis)
 {
-    cJSON *routejson,*retjson;
+    cJSON *routejson,*retjson,*array = cJSON_CreateArray();
     routejson = cJSON_CreateObject();
     jaddstr(routejson,"id",Host_peerid);
     jaddstr(routejson,"channel",Host_channel);
     jaddnum(routejson,"msatoshi",satoshis*1000);
     jaddnum(routejson,"delay",10);
+    jaddi(array,routejson);
     // route { "id" : "02779b57b66706778aa1c7308a817dc080295f3c2a6af349bb1114b8be328c28dc", "channel" : "27446:1:0", "msatoshi" : 1000000, "delay" : 10 }
     // replace rhash in route
-    if ( (retjson= chipsln_sendpay(routejson,rhash)) != 0 )
+    if ( (retjson= chipsln_sendpay(array,rhash)) != 0 )
     {
-        printf("sendpay %.8f to %s -> %s\n",dstr(satoshis),jprint(routejson,0),jprint(retjson,0));
+        printf("sendpay %.8f to %s -> %s\n",dstr(satoshis),jprint(array,0),jprint(retjson,0));
         free_json(retjson);
     }
-    free_json(routejson);
+    free_json(array);
 }
 
 int32_t BET_client_join(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars,int32_t senderid)
