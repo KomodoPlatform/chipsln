@@ -34,7 +34,11 @@ int32_t BET_client_join(cJSON *argjson,struct privatebet_info *bet,struct privat
     {
         safecopy(Host_ipaddr,jstr(argjson,"hostip"),sizeof(Host_ipaddr));
         safecopy(Host_peerid,jstr(argjson,"hostid"),sizeof(Host_peerid));
-        chipsln_connect(Host_ipaddr,LN_port,Host_peerid);
+        if ( (retjson= chipsln_connect(Host_ipaddr,LN_port,Host_peerid)) != 0 )
+        {
+            printf("CONNECTLN.(%s)\n",jprint(rejson,0));
+            free_json(retjson);
+        }
         // if error, clear Host_peerid
         // else open channel
     }
