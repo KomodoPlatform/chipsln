@@ -354,7 +354,10 @@ void BET_clientloop(void *_ptr)
                 nn_freemsg(ptr);
             }
             if ( nonz == 0 )
-                usleep(10000);
+            {
+                printf("%s round.%d turni.%d myid.%d\n",VARS->game,VARS->round,VARS->turni,bet->myplayerid);
+                usleep(5000000);
+            }
         }
         else if ( hostip[0] != 0 && port > 0 )
         {
