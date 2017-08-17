@@ -362,6 +362,7 @@ void BET_clientloop(void *_ptr)
         else if ( hostip[0] != 0 && port > 0 )
         {
             BET_transportname(0,connectaddr,hostip,port);
+            safecopy(Host_ipaddr,hostip,sizeof(Host_ipaddr));
             printf("connect %s\n",connectaddr);
             bet->subsock = BET_nanosock(0,connectaddr,NN_SUB);
             BET_transportname(0,connectaddr,hostip,port+1);
