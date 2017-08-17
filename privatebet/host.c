@@ -308,8 +308,12 @@ void BET_hostloop(void *_ptr)
             {
                 //BETS_players_update(bet,VARS);
             }
-            printf("%s round.%d turni.%d myid.%d\n",bet->game,VARS->round,VARS->turni,bet->myplayerid);
-            sleep(5);
+            if ( time(NULL) > lasttime+5 )
+            {
+                printf("%s round.%d turni.%d myid.%d\n",bet->game,VARS->round,VARS->turni,bet->     myplayerid);
+                lasttime = (uint32_t)time(NULL);
+            }
+            usleep(10000);
         }
         if ( Gamestarted == 0 )
         {

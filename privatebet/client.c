@@ -337,7 +337,7 @@ int32_t BET_clientupdate(cJSON *argjson,uint8_t *ptr,int32_t recvlen,struct priv
 
 void BET_clientloop(void *_ptr)
 {
-    int32_t nonz,recvlen; uint16_t port=7798; char connectaddr[64],hostip[64]; void *ptr; cJSON *msgjson,*reqjson; struct privatebet_vars *VARS; struct privatebet_info *bet = _ptr;
+    uint32_t lasttime = 0; int32_t nonz,recvlen; uint16_t port=7798; char connectaddr[64],hostip[64]; void *ptr; cJSON *msgjson,*reqjson; struct privatebet_vars *VARS; struct privatebet_info *bet = _ptr;
     VARS = calloc(1,sizeof(*VARS));
     strcpy(hostip,"5.9.253.195"); // jl777: get from BET blockchain
     printf("client loop: pushsock.%d subsock.%d\n",bet->pushsock,bet->subsock);
@@ -359,8 +359,12 @@ void BET_clientloop(void *_ptr)
             }
             if ( nonz == 0 )
             {
-                printf("%s round.%d turni.%d myid.%d | valid.%d\n",bet->game,VARS->round,VARS->turni,bet->myplayerid,VARS->validperms);
-                usleep(5000000);
+                if ( time(NULL) > lasttime+5 )
+                {
+                    printf("%s round.%d turni.%d myid.%d | valid.%d\n",bet->game,VARS->round,VARS->turni,bet->myplayerid,VARS->validperms);
+                    lasttime = (uint32_t)time(NULL);
+                }
+                usleep(10000);
             }
         }
         else if ( hostip[0] != 0 && port > 0 )
