@@ -266,7 +266,8 @@ int main(int argc, char *argv[])
 	gossip_init(ld);
 
 	/* Initialize block topology. */
-	setup_topology(ld->topology, ld->bitcoind, &ld->dstate.timers,
+    printf("call setup_topology\n");
+    setup_topology(ld->topology, ld->bitcoind, &ld->dstate.timers,
 		       ld->dstate.config.poll_time,
 		       /* FIXME: Load from peers. */
 		       0);
