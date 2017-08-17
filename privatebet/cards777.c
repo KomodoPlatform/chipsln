@@ -593,6 +593,6 @@ char *BET_createdeck(cJSON *argjson)
         free(cardpubs);
         free(playerpubs);
     } else jaddstr(retjson,"error","nopubkeys");
-    printf("created deck.(%s)\n",jprint(retjson,0));
+    //printf("created deck.(%s)\n",jprint(retjson,0));
     return(jprint(retjson,1));
 }

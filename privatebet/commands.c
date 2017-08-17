@@ -195,7 +195,7 @@ char *pangea_command(void *ctx,cJSON *argjson,char *remoteaddr,uint16_t port)
 char *stats_JSON(void *ctx,char *myipaddr,int32_t mypubsock,cJSON *argjson,char *remoteaddr,uint16_t port)
 {
     char *agent;
-    printf("stats_JSON(%s)\n",jprint(argjson,0));
+    //printf("stats_JSON(%s)\n",jprint(argjson,0));
     agent = jstr(argjson,"agent");
     if ( (agent= jstr(argjson,"agent")) != 0 )
     {

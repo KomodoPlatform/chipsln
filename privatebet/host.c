@@ -117,7 +117,7 @@ void BET_host_gamestart(struct privatebet_info *bet,struct privatebet_vars *vars
     deckjson = 0;
     if ( (reqjson= BET_createdeck_request(bet->playerpubs,bet->numplayers,bet->range)) != 0 )
     {
-        printf("call oracle\n");
+        //printf("call oracle\n");
         if ( (retstr= BET_oracle_request("createdeck",reqjson)) != 0 )
         {
             if ( (deckjson= cJSON_Parse(retstr)) != 0 )
@@ -307,7 +307,8 @@ void BET_hostloop(void *_ptr)
             {
                 //BETS_players_update(bet,VARS);
             }
-            sleep(3);
+            printf("%s round.%d turni.%d myid.%d\n",bet->game,VARS->round,VARS->turni,bet->myplayerid);
+            sleep(5);
         }
         if ( Gamestarted == 0 )
         {

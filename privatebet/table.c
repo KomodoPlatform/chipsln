@@ -81,6 +81,7 @@ cJSON *BET_betinfo_json(struct privatebet_info *bet,struct privatebet_vars *vars
     jaddbits256(betjson,"tableid",bet->tableid);
     jaddnum(betjson,"maxplayers",bet->maxplayers);
     array = cJSON_CreateArray();
+    bet->myplayerid = -1;
     for (i=n=0; i<bet->maxplayers; i++)
     {
         if ( bits256_nonz(bet->playerpubs[i]) != 0 )
