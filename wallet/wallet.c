@@ -148,7 +148,8 @@ const struct utxo **wallet_select_coins(const tal_t *ctx, struct wallet *w,
 	}
 	available = wallet_get_utxos(ctx, w, output_state_available);
 
-	for (i = 0; i < tal_count(available); i++) {
+	for (i = 0; i < tal_count(available); i++)
+    {
 		tal_resize(&utxos, i + 1);
 		utxos[i] = tal_steal(utxos, available[i]);
 
@@ -165,9 +166,11 @@ const struct utxo **wallet_select_coins(const tal_t *ctx, struct wallet *w,
 		weight += 1 + (1 + 73 + 1 + 33);
 		*fee_estimate = weight * feerate_per_kw / 1000;
 		satoshi_in += utxos[i]->amount;
+        printf("%llu ",(long long)utxos[i]->amount);
 		if (satoshi_in >= *fee_estimate + value)
 			break;
 	}
+    printf("satoshi_in %llu\n",(long long)satosho_in);
 	tal_free(available);
 
 	if (satoshi_in < *fee_estimate + value) {

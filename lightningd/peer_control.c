@@ -2002,37 +2002,33 @@ static void json_fund_channel(struct command *cmd,
 	struct funding_channel *fc = tal(cmd, struct funding_channel);
 	u8 *msg;
 
-	if (!json_get_params(buffer, params,
-			     "id", &peertok,
-			     "satoshi", &satoshitok,
-			     NULL)) {
+	if (!json_get_params(buffer, params,"id", &peertok,"satoshi", &satoshitok,NULL))
+    {
 		command_fail(cmd, "Need peerid and satoshi");
 		return;
 	}
-
 	fc->cmd = cmd;
 	fc->peer = peer_from_json(ld, buffer, peertok);
-	if (!fc->peer) {
+	if (!fc->peer)
+    {
 		command_fail(cmd, "Could not find peer with that peerid");
 		return;
 	}
-	if (fc->peer->owner != ld->gossip) {
+	if (fc->peer->owner != ld->gossip)
+    {
 		command_fail(cmd, "Peer not ready for connection");
 		return;
 	}
-
-	if (!json_tok_u64(buffer, satoshitok, &fc->peer->funding_satoshi)) {
+	if (!json_tok_u64(buffer, satoshitok, &fc->peer->funding_satoshi))
+    {
 		command_fail(cmd, "Invalid satoshis");
 		return;
 	}
-
 	/* FIXME: Support push_msat? */
 	fc->peer->push_msat = 0;
-
 	/* Try to do this now, so we know if insufficient funds. */
 	/* FIXME: Feerate & dustlimit */
-	fc->utxomap = build_utxos(fc, ld, fc->peer->funding_satoshi, 15000, 600,
-				  &fc->change, &fc->change_keyindex);
+	fc->utxomap = build_utxos(fc, ld, fc->peer->funding_satoshi, 15000, 600,&fc->change, &fc->change_keyindex);
 	if (!fc->utxomap) {
 		command_fail(cmd, "Cannot afford funding transaction");
 		return;

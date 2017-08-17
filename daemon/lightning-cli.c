@@ -25,9 +25,13 @@ int main(int argc, char *argv[])
     {
         if ( cli_main(buffer,maxsize,argc,argv,0) == 0 )
         {
-            printf("%s\n",buffer);
+            printf("%s",buffer);
             retval = 1;
-        } else printf("error from cli_main.(%s)\n",buffer);
+        }
+        else
+        {
+            printf("error %s",buffer);
+        }
         free(buffer);
     }
     return(retval);
