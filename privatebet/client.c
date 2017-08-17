@@ -166,7 +166,7 @@ int32_t BET_client_gamestart(cJSON *argjson,struct privatebet_info *bet,struct p
 
 int32_t BET_client_gamestarted(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars,int32_t senderid)
 {
-    int32_t i; cJSON *array,*reqjson;
+    int32_t i; cJSON *array,*reqjson; char str[65];
     if ( senderid >= 0 && senderid <= bet->numplayers )
     {
         vars->hashes[senderid][0] = jbits256(argjson,"hash");
@@ -182,7 +182,7 @@ int32_t BET_client_gamestarted(cJSON *argjson,struct privatebet_info *bet,struct
             jaddstr(reqjson,"method","perm");
             jadd(reqjson,"perm",array);
             BET_message_send("BET_perm",bet->pubsock>=0?bet->pubsock:bet->pushsock,reqjson,1,bet);
-        } else printf("i.%d != num.%d senderid.%d process gamestarted.(%s)\n",i,bet->numplayers,senderid,jprint(argjson,0));
+        } else printf("i.%d != num.%d senderid.%d process gamestarted.(%s) [sender.%d] <- %s\n",i,bet->numplayers,senderid,jprint(argjson,0),senderid,bits256_str(str,hash));
     }
     return(0);
 }
@@ -356,7 +356,7 @@ void BET_clientloop(void *_ptr)
             }
             if ( nonz == 0 )
             {
-                printf("%s round.%d turni.%d myid.%d\n",bet->game,VARS->round,VARS->turni,bet->myplayerid);
+                printf("%s round.%d turni.%d myid.%d | valid.%d\n",bet->game,VARS->round,VARS->turni,bet->myplayerid,vars->validperm);
                 usleep(5000000);
             }
         }
