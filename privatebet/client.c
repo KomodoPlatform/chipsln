@@ -79,7 +79,7 @@ void BET_client_turnisend(struct privatebet_info *bet,struct privatebet_vars *va
 void BET_client_turninext(struct privatebet_info *bet,struct privatebet_vars *vars)
 {
     cJSON *reqjson;
-    printf("BET_turni_next (%d, %d) numplayers.%d range.%d\n",vars->turni,vars->round,vars->numplayers,vars->range);
+    printf("BET_turni_next (%d, %d) numplayers.%d range.%d\n",vars->turni,vars->round,bet->numplayers,bet->range);
     if ( IAMHOST == 0 && vars->validperms == 0 )
         return;
     if ( bits256_cmp(bet->tableid,Mypubkey) != 0 )
