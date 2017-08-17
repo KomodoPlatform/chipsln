@@ -282,8 +282,8 @@ static void get_gossip_fd_for_channeld_reconnect(struct lightningd *ld,
 
 	/* FIXME: set sync to `initial_routing_sync` */
 	req = towire_gossipctl_get_peer_gossipfd(ggf, unique_id, true);
-	subd_req(ggf, ld->gossip, take(req), -1, 1,
-		 get_peer_gossipfd_channeld_reply, ggf);
+    printf("subd_req\n");
+	subd_req(ggf, ld->gossip, take(req), -1, 1,get_peer_gossipfd_channeld_reply, ggf);
 }
 
 static bool get_peer_gossipfd_closingd_reply(struct subd *subd, const u8 *msg,
@@ -369,8 +369,7 @@ static bool peer_reconnected(struct lightningd *ld,
 	if (!peer)
 		return false;
 
-	log_info(peer->log, "Peer has reconnected, state %s",
-		 peer_state_name(peer->state));
+	log_info(peer->log, "Peer has reconnected, state %s",peer_state_name(peer->state));
 
 	/* BOLT #2:
 	 *
@@ -384,40 +383,40 @@ static bool peer_reconnected(struct lightningd *ld,
 		tal_steal(io_new_conn(peer, fd, send_error, pcs), pcs);
 		return true;
 	}
-
+    printf("peer->state %d\n",peer->state);
 	switch (peer->state) {
-	/* This can't happen. */
-	case UNINITIALIZED:
-		abort();
+	case UNINITIALIZED: //This can't happen.
+            printf("peer_reconnected: UNINITIALIZED case\n");
+            abort();
 
 	case GOSSIPD:
-		/* Tell gossipd to kick that one out, will call peer_fail */
+		// Tell gossipd to kick that one out, will call peer_fail
 		subd_send_msg(peer->ld->gossip,
 			      take(towire_gossipctl_fail_peer(peer,
 							      peer->unique_id)));
 		tal_free(peer);
-		/* Continue with a new peer. */
+		// Continue with a new peer
 		return false;
 
 	case OPENINGD:
-		/* Kill off openingd, forget old peer. */
+		// Kill off openingd, forget old peer
 		peer->owner->peer = NULL;
 		tal_free(peer->owner);
 		tal_free(peer);
 
-		/* A fresh start. */
+		// A fresh start.
 		return false;
 
 	case CHANNELD_AWAITING_LOCKIN:
 	case CHANNELD_NORMAL:
 	case CHANNELD_SHUTTING_DOWN:
-		/* We need the gossipfd now */
+		// We need the gossipfd now
 		get_gossip_fd_for_channeld_reconnect(ld, id, peer->unique_id, fd, cs);
 		return true;
 
 	case CLOSINGD_SIGEXCHANGE:
 	case CLOSINGD_COMPLETE:
-		/* We need the gossipfd now */
+		// We need the gossipfd now
 		get_gossip_fd_for_closingd_reconnect(ld, id, peer->unique_id, fd, cs);
 		return true;
 
@@ -425,6 +424,7 @@ static bool peer_reconnected(struct lightningd *ld,
 	case ONCHAIND_THEIR_UNILATERAL:
 	case ONCHAIND_OUR_UNILATERAL:
 	case ONCHAIND_MUTUAL:
+            printf("peer_reconnected: unimplemented case\n");
 		; /* FIXME: Implement! */
 	}
 	abort();
