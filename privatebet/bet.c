@@ -107,6 +107,7 @@ int main(int argc,const char *argv[])
                     BET_transportname(1,bindaddr,hostip,port+1);
                     pullsock = BET_nanosock(1,bindaddr,NN_PULL);
                     IAMHOST = 1;
+                    safecopy(Host_peerid,LN_idstr,sizeof(Host_peerid));
                     safecopy(Host_ipaddr,hostip,sizeof(Host_ipaddr));
                     // publish to BET chain
                 }
