@@ -113,6 +113,7 @@ void BET_client_turninext(struct privatebet_info *bet,struct privatebet_vars *va
 int32_t BET_client_turni(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars,int32_t senderid)
 {
     struct privatebet_vars argvars; int32_t n;
+    printf("client TURNI.(%s)\n",jprint(argjson,0));
     if ( vars->validperms != 0 && senderid >= 0 && senderid < bet->numplayers )
     {
         memset(&argvars,0,sizeof(argvars));
