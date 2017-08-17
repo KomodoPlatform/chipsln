@@ -92,9 +92,10 @@ int32_t BET_host_join(cJSON *argjson,struct privatebet_info *bet,struct privateb
 
 int32_t BET_hostcommand(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars)
 {
-    char *method;
+    char *method; int32_t senderid;
     if ( (method= jstr(argjson,"method")) != 0 )
     {
+        senderid = BET_senderid(argjson,bet);
         if ( strcmp(method,"join") == 0 )
             return(BET_host_join(argjson,bet,vars));
         else if ( strcmp(method,"turni") == 0 )
