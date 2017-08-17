@@ -41,43 +41,63 @@ void BET_sendpay(bits256 rhash,uint64_t satoshis)
 
 int32_t BET_client_join(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars,int32_t senderid)
 {
-    cJSON *array,*pubkeys,*retjson,*channels,*item; int32_t i,n,len; bits256 hash; char *idstr,*source,*dest,*short_id;
+    cJSON *array,*pubkeys,*retjson,*channels,*item; int32_t i,n,already_connected,len; bits256 hash; char *idstr,*source,*dest,*short_id;
     if ( Host_peerid[0] == 0 )
     {
         safecopy(Host_peerid,jstr(argjson,"hostid"),sizeof(Host_peerid));
-        if ( (retjson= chipsln_connect(Host_ipaddr,LN_port,Host_peerid)) != 0 )
+        already_connected = 0;
+        if ( (retjson= chipsln_getpeers()) != 0 )
+        {
+            //{ "peers" :[{ "unique_id" : 0, "state" : "GOSSIPD", "netaddr" : "5.9.253.195:9735", "peerid" : "02779b57b66706778aa1c7308a817dc080295f3c2a6af349bb1114b8be328c28dc", "owner" : "lightningd_gossip" } ] }
+            if ( (array= jarray(&n,retjson,"peers")) != 0 )
+            {
+                for (i=0; i<n; i++)
+                {
+                    item = jitem(array,i);
+                    if ( (idstr= jstr(retjson,"peerid")) != 0 && strcmp(idstr,Host_peerid) == 0 )
+                    {
+                        already_connected = 1;
+                        break;
+                    }
+                }
+            }
+            free_json(retjson);
+        }
+        if ( already_connected == 0 && (retjson= chipsln_connect(Host_ipaddr,LN_port,Host_peerid)) != 0 )
         {
             printf("(%s:%u %s) CONNECTLN.(%s)\n",Host_ipaddr,LN_port,Host_peerid,jprint(retjson,0));
             if ( (idstr= jstr(retjson,"id")) != 0 && strcmp(idstr,Host_peerid) == 0 )
+                already_connected = 1;
+            free_json(retjson);
+        }
+        if ( already_connected != 0 && Host_channel[0] == 0 )
+        {
+            if ( (channels= chipsln_getchannels()) != 0 )
             {
-                if ( (channels= chipsln_getchannels()) != 0 )
+                if ( (array= jarray(&n,channels,"channels")) != 0 )
                 {
-                    if ( (array= jarray(&n,channels,"channels")) != 0 )
+                    for (i=0; i<n; i++)
                     {
-                        for (i=0; i<n; i++)
+                        item = jitem(array,i);
+                        source = jstr(item,"source");
+                        dest = jstr(item,"destination");
+                        short_id = jstr(item,"short_id");
+                        if ( source != 0 && dest != 0 && strcmp(source,LN_idstr) == 0 && strcmp(dest,Host_peerid) == 0 && short_id != 0 )
                         {
-                            item = jitem(array,i);
-                            source = jstr(item,"source");
-                            dest = jstr(item,"destination");
-                            short_id = jstr(item,"short_id");
-                            if ( source != 0 && dest != 0 && strcmp(source,LN_idstr) == 0 && strcmp(dest,Host_peerid) == 0 && short_id != 0 )
+                            len = strlen(short_id);
+                            if ( len > 3 && short_id[len-3] == '/' )
                             {
-                                len = strlen(short_id);
-                                if ( len > 3 && short_id[len-3] == '/' )
-                                {
-                                    strcpy(Host_channel,short_id);
-                                    Host_channel[len-3] = 0;
-                                    printf("Host_channel.(%s)\n",Host_channel);
-                                }
+                                strcpy(Host_channel,short_id);
+                                Host_channel[len-3] = 0;
+                                printf("Host_channel.(%s)\n",Host_channel);
                             }
                         }
                     }
-                    free_json(channels);
                 }
+                free_json(channels);
+            }
                 //{ "channels" :[{ "source" : "02779b57b66706778aa1c7308a817dc080295f3c2a6af349bb1114b8be328c28dc", "destination" : "03b03efcf647e6dd48b949e5b1f7e9e064257a5c48c2d56b1334b283b48338f821", "active" : true, "fee_per_kw" : 10, "last_update" : 1502988553, "flags" : 0, "delay" : 10, "short_id" : "27446:1:0/0" }, { "source" : "03b03efcf647e6dd48b949e5b1f7e9e064257a5c48c2d56b1334b283b48338f821", "destination" : "02779b57b66706778aa1c7308a817dc080295f3c2a6af349bb1114b8be328c28dc", "active" : true, "fee_per_kw" : 10, "last_update" : 1502988553, "flags" : 1, "delay" : 10, "short_id" : "27446:1:0/1" } ] }
                 
-            } else Host_peerid[0] = 0;
-            free_json(retjson);
         }
         // else open channel
     }
