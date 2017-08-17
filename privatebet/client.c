@@ -137,8 +137,8 @@ int32_t BET_client_turni(cJSON *argjson,struct privatebet_info *bet,struct priva
 int32_t BET_client_tablestatus(cJSON *msgjson,struct privatebet_info *bet,struct privatebet_vars *vars)
 {
     BET_betinfo_parse(bet,vars,msgjson);
-    if ( vars->turni == bet->myplayerid )
-        BET_client_turnisend(bet,vars);
+    /*if ( vars->turni == bet->myplayerid )
+        BET_client_turnisend(bet,vars);*/
     return(0);
 }
 
@@ -167,7 +167,6 @@ int32_t BET_client_gamestart(cJSON *argjson,struct privatebet_info *bet,struct p
 int32_t BET_client_gamestarted(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars,int32_t senderid)
 {
     int32_t i; cJSON *array,*reqjson; char str[65];
-    printf("gamestarted.%d\n",senderid);
     if ( senderid >= 0 && senderid <= bet->numplayers )
     {
         vars->hashes[senderid][0] = jbits256(argjson,"hash");
@@ -182,8 +181,9 @@ int32_t BET_client_gamestarted(cJSON *argjson,struct privatebet_info *bet,struct
             reqjson = cJSON_CreateObject();
             jaddstr(reqjson,"method","perm");
             jadd(reqjson,"perm",array);
+            printf("send perm\n");
             BET_message_send("BET_perm",bet->pubsock>=0?bet->pubsock:bet->pushsock,reqjson,1,bet);
-        } else printf("i.%d != num.%d senderid.%d process gamestarted.(%s) [sender.%d] <- %s\n",i,bet->numplayers,senderid,jprint(argjson,0),senderid,bits256_str(str,vars->hashes[senderid][0]));
+        } //else printf("i.%d != num.%d senderid.%d process gamestarted.(%s) [sender.%d] <- %s\n",i,bet->numplayers,senderid,jprint(argjson,0),senderid,bits256_str(str,vars->hashes[senderid][0]));
     }
     return(0);
 }
@@ -191,6 +191,7 @@ int32_t BET_client_gamestarted(cJSON *argjson,struct privatebet_info *bet,struct
 int32_t BET_client_perm(cJSON *argjson,struct privatebet_info *bet,struct privatebet_vars *vars,int32_t senderid)
 {
     int32_t i,n,j; cJSON *array;
+    printf("got perm.(%s) sender.%d\n",jprint(argjson,0),senderid);
     if ( senderid >= 0 && senderid < bet->numplayers )
     {
         if ( (array= jarray(&n,argjson,"perm")) != 0 && n == bet->range )
