@@ -107,7 +107,7 @@ int main(int argc,const char *argv[])
                     BET_transportname(1,bindaddr,hostip,port+1);
                     pullsock = BET_nanosock(1,bindaddr,NN_PULL);
                     IAMHOST = 1;
-                    strcpy(Host_ipaddr,hostip,sizeof(Host_ipaddr));
+                    safecopy(Host_ipaddr,hostip,sizeof(Host_ipaddr));
                     // publish to BET chain
                 }
                 else if ( strcmp(modestr,"oracle") == 0 )

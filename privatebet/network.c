@@ -17,7 +17,7 @@ cJSON *BET_pubkeys(struct privatebet_info *bet)
 {
     int32_t i; cJSON *array = cJSON_CreateArray();
     for (i=0; i<bet->numplayers; i++)
-        jaddibits256(array,bet->pubkeys[i]);
+        jaddibits256(array,bet->playerpubs[i]);
     return(array);
 }
 
@@ -49,7 +49,7 @@ void BET_message_send(char *debugstr,int32_t sock,cJSON *msgjson,int32_t freefla
         jadd(msgjson,"hostrhash",BET_hostrhashes(bet));
         jadd(msgjson,"pubkeys",BET_pubkeys(bet));
         jaddnum(msgjson,"LN_port",LN_port);
-        jaddnum(msgjson,"chipsize",chipsize);
+        jaddnum(msgjson,"chipsize",bet->chipsize);
         jaddstr(msgjson,"hostip",Host_ipaddr);
         jaddstr(msgjson,"hostid",Host_peerid);
     } else jaddbits256(msgjson,"clientrhash",BET_clientrhash());
