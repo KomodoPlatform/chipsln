@@ -73,8 +73,10 @@ int32_t BET_client_join(cJSON *argjson,struct privatebet_info *bet,struct privat
         }
         if ( already_connected != 0 && Host_channel[0] == 0 )
         {
+            printf("getchannels\n");
             if ( (channels= chipsln_getchannels()) != 0 )
             {
+                printf("got.(%s)\n",jprint(channels,0));
                 if ( (array= jarray(&n,channels,"channels")) != 0 )
                 {
                     for (i=0; i<n; i++)
