@@ -20,7 +20,7 @@ void configdir_register_opts(const tal_t *ctx,
 			     char **configdir, char **rpc_filename)
 {
 	*configdir = default_configdir(ctx);
-	*rpc_filename = "lightning-rpc";
+	*rpc_filename = "chipsln-rpc";
 
 	opt_register_early_arg("--lightning-dir", opt_set_charp, opt_show_charp,
 			       configdir,
