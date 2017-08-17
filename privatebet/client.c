@@ -271,7 +271,7 @@ int32_t BET_senderid(cJSON *argjson,struct privatebet_info *bet)
     if ( peerid != 0 && strcmp(Host_peerid,peerid) == 0 )
         return(bet->maxplayers);
     for (i=0; i<bet->numplayers; i++)
-        if ( bits256_cmp(jbits256(argjson,"sender"),bet->playerpubs[i]) == 0 )
+        if ( bits256_cmp(jbits256(argjson,"pubkey"),bet->playerpubs[i]) == 0 )
             return(i);
     return(-1);
 }
