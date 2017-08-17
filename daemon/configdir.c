@@ -16,8 +16,7 @@ static char *default_configdir(const tal_t *ctx)
 	return path;
 }
 
-void configdir_register_opts(const tal_t *ctx,
-			     char **configdir, char **rpc_filename)
+void configdir_register_opts(const tal_t *ctx,char **configdir, char **rpc_filename)
 {
 	*configdir = default_configdir(ctx);
 	*rpc_filename = "chipsln-rpc";
