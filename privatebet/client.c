@@ -101,7 +101,7 @@ int32_t BET_client_join(cJSON *argjson,struct privatebet_info *bet,struct privat
                 }
                 free_json(channels);
             }
-                //{ "channels" :[{ "source" : "02779b57b66706778aa1c7308a817dc080295f3c2a6af349bb1114b8be328c28dc", "destination" : "03b03efcf647e6dd48b949e5b1f7e9e064257a5c48c2d56b1334b283b48338f821", "active" : true, "fee_per_kw" : 10, "last_update" : 1502988553, "flags" : 0, "delay" : 10, "short_id" : "27446:1:0/0" }, { "source" : "03b03efcf647e6dd48b949e5b1f7e9e064257a5c48c2d56b1334b283b48338f821", "destination" : "02779b57b66706778aa1c7308a817dc080295f3c2a6af349bb1114b8be328c28dc", "active" : true, "fee_per_kw" : 10, "last_update" : 1502988553, "flags" : 1, "delay" : 10, "short_id" : "27446:1:0/1" } ] }
+//{ "channels" :[{ "source" : "02779b57b66706778aa1c7308a817dc080295f3c2a6af349bb1114b8be328c28dc", "destination" : "03b03efcf647e6dd48b949e5b1f7e9e064257a5c48c2d56b1334b283b48338f821", "active" : true, "fee_per_kw" : 10, "last_update" : 1502988553, "flags" : 0, "delay" : 10, "short_id" : "27446:1:0/0" }, { "source" : "03b03efcf647e6dd48b949e5b1f7e9e064257a5c48c2d56b1334b283b48338f821", "destination" : "02779b57b66706778aa1c7308a817dc080295f3c2a6af349bb1114b8be328c28dc", "active" : true, "fee_per_kw" : 10, "last_update" : 1502988553, "flags" : 1, "delay" : 10, "short_id" : "27446:1:0/1" } ] }
                 
         }
         // else open channel
